@@ -1,4 +1,4 @@
-﻿namespace Project_EgennamJO.Property
+﻿namespace Project_EgennamJO
 {
     partial class BinaryProp
     {

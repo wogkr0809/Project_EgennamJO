@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Project_EgennamJO.Property
+namespace Project_EgennamJO
 {
     public partial class BinaryProp : UserControl
     {
