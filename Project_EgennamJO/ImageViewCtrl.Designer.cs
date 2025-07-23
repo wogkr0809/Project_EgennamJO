@@ -1,6 +1,6 @@
 ﻿namespace Project_EgennamJO
 {
-    partial class BinaryProp
+    partial class ImageViewCtrl
     {
         /// <summary> 
         /// 필수 디자이너 변수입니다.
@@ -28,30 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(28, 20);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(94, 36);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // BinaryProp
+            // ImageViewCtrl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.button1);
-            this.Name = "BinaryProp";
+            this.Name = "ImageViewCtrl";
+            //this.Paint += new System.Windows.Forms.PaintEventHandler(this.ImageViewCtrl_Paint);
+            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseDobuleClik);
+            this.Resize += new System.EventHandler(this.ImageView_Resize);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Button button1;
     }
 }

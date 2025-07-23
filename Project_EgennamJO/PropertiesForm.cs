@@ -14,13 +14,16 @@ using Project_EgennamJO.Property;
 
 namespace Project_EgennamJO
 {
+    public enum PropertyType
+    {
+        Binary,
+        Filter
+    }
+
     public partial class PropertiesForm : DockContent
     {
-        public enum PropertyType
-        {
-            Binary,
-            Filter
-        }
+        private Dictionary<string, TabPage> _allTabs = new Dictionary<string, TabPage>();
+
         public PropertiesForm()
         {
             InitializeComponent();
@@ -32,14 +35,21 @@ namespace Project_EgennamJO
         {
             string tabName = propType.ToString();
 
-            foreach(TabPage tabPage in tabPropControl.TabPages)
+            foreach (TabPage tabPage in tabPropControl.TabPages)
             {
                 if (tabPage.Text == tabName)
                     return;
 
             }
+
+            if(_allTabs.TryGetValue(tabName, out TabPage page))
+            {
+                tabPropControl.TabPages.Add(page);
+                return;
+            }
+
             UserControl _inspProp = CreateUserControl(propType);
-            if(_inspProp == null)
+            if (_inspProp == null)
                 return;
 
             TabPage newTab = new TabPage(tabName)
@@ -49,7 +59,7 @@ namespace Project_EgennamJO
             _inspProp.Dock = DockStyle.Fill;
             newTab.Controls.Add(_inspProp);
             tabPropControl.TabPages.Add(newTab);
-            tabPropControl.SelectedTab = newTab; // 새 탭 선택
+            tabPropControl.SelectedTab = newTab; 
 
             _allTabs[tabName] = newTab;
         }
@@ -72,5 +82,11 @@ namespace Project_EgennamJO
             }
             return curProp;
         }
+
+        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
+
