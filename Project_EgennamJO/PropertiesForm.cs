@@ -17,7 +17,8 @@ namespace Project_EgennamJO
     public enum PropertyType
     {
         Binary,
-        Filter
+        Filter,
+        AIModule
     }
 
     public partial class PropertiesForm : DockContent
@@ -30,6 +31,7 @@ namespace Project_EgennamJO
 
             LoadOptionControl(PropertyType.Filter);
             LoadOptionControl(PropertyType.Binary);
+            LoadOptionControl(PropertyType.AIModule);
         }
         private void LoadOptionControl(PropertyType propType)
         {
@@ -76,6 +78,10 @@ namespace Project_EgennamJO
                     ImageFilterProp filterProp = new ImageFilterProp();
                     curProp = filterProp;
                     break;
+                case PropertyType.AIModule:
+                    AIModuleProp aiModuleProp = new AIModuleProp();
+                    curProp = aiModuleProp;
+                    break;
                 default:
                     MessageBox.Show("유효하지 않은 옵션입니다.");
                     return null;
@@ -83,10 +89,7 @@ namespace Project_EgennamJO
             return curProp;
         }
 
-        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
+       
     }
 }
 
