@@ -80,6 +80,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Global.cs" />
+    <Compile Include="Core\InspStage.cs" />
     <Compile Include="ImageViewCtrl.cs">
       <SubType>UserControl</SubType>
     </Compile>

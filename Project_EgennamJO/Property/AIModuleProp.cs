@@ -12,26 +12,57 @@ namespace Project_EgennamJO
 {
     public partial class AIModuleProp : UserControl
     {
+
         SAIGEAI _saigeAI;
         string _modelPath = string.Empty;
+
         public AIModuleProp()
         {
             InitializeComponent();
         }
         private void btnSelAIModel_Click(object sender, EventArgs e)
         {
+            int selType = cbEngineList.SelectedIndex;
+            string abc = "AI Files|*.*";
+            switch (selType)
+            {
+                case 0:
+                    abc = "AI Files | *.saigeiad;";
+                    break;
+                case 1:
+                    abc = "AI Files | *.saigedet;";
+                    break;
+                case 2:
+                    abc = "AI Files | *.saigeseg;";
+                    break;
+            }
+
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Title = "AI 모델 선택";
-                openFileDialog.Filter = "AI Files|*.*";
                 openFileDialog.Multiselect = false;
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     _modelPath = openFileDialog.FileName;
                     textBox1.Text = _modelPath;
                 }
-
             }
+        }
+        private void btnLoadModel_Click(object sender, EventArgs e)
+        {
+             if (string.IsNullOrEmpty(_modelPath))
+            {
+                MessageBox.Show("모델 파일을 선택해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (_saigeAI == null)
+            {
+                _saigeAI = Global.Inst.InspStage.AIModule;
+            }
+
+            _saigeAI.LoadEngine(_modelPath);
+            MessageBox.Show("모델이 성공적으로 로드되었습니다.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

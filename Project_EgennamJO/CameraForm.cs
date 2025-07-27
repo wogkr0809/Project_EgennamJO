@@ -35,6 +35,7 @@ namespace Project_EgennamJO
 
             imageViewCtrl.Location = new System.Drawing.Point(margin, margin);
         }
+        public void UpdateDisplay(Bitmap bitmap = null)
 
        
     }
