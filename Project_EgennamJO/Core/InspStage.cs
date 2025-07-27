@@ -9,11 +9,12 @@ namespace Project_EgennamJO.Core
 {
     public class InspStage : IDisposable
     {
+        
         SAIGEAI _saigeAI; // SaigeAI 인스턴스
 
         public InspStage() { }
 
-        public SAIGEAI AIMoudle
+        public SAIGEAI AIModule
         {
             get
             {
@@ -50,6 +51,7 @@ namespace Project_EgennamJO.Core
             return bitmap;
         }
 
+      
         #region Disposable
 
         private bool disposed = false; // to detect redundant calls
@@ -75,3 +77,4 @@ namespace Project_EgennamJO.Core
         }
     }
 }
+

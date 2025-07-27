@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_EgennamJO.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -63,6 +64,19 @@ namespace Project_EgennamJO
 
             _saigeAI.LoadEngine(_modelPath);
             MessageBox.Show("모델이 성공적으로 로드되었습니다.", "정보", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnInspAI_Click(object sender, EventArgs e)
+        {
+            if(_saigeAI == null)
+            {
+                MessageBox.Show("AI 모듈이 초기화되지 않았습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Bitmap bitmap = Global.Inst.InspStage.GetCurrentImage();
+            _saigeAI.Inspect(bitmap);
+            Bitmap resultImage = _saigeAI.GetResultImage();
+            Global.Inst.InspStage.UpdateDisplay(resultImage);
         }
     }
 }

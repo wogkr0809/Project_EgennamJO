@@ -74,6 +74,7 @@
             this.btnInspAI.TabIndex = 3;
             this.btnInspAI.Text = "AI 검사";
             this.btnInspAI.UseVisualStyleBackColor = true;
+            this.btnInspAI.Click += new System.EventHandler(this.btnInspAI_Click);
             // 
             // cbEngineList
             // 

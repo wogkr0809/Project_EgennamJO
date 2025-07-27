@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 namespace Project_EgennamJO
 {
-    internal class SAIGEAI : IDisposable
+    public class SAIGEAI : IDisposable
     {
         public enum EngineType { IAD, SEG, DET };
         public EngineType _engineType;
