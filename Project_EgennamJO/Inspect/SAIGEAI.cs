@@ -9,6 +9,8 @@ using SaigeVision.Net.V2;
 using SaigeVision.Net.V2.IAD;
 using System.Windows.Forms;
 using System.Diagnostics;
+using SaigeVision.Net.V2.Detection;
+using SaigeVision.Net.V2.Segmentation;
 
 namespace Project_EgennamJO
 {
@@ -16,11 +18,17 @@ namespace Project_EgennamJO
     {
         IADEngine _IADEngine = null;
         IADResult _IADResult = null;
+
         Bitmap _InspImage = null;
+
+        DetectionEngine _DetEngine = null;
+        DetectionResult _DetResult = null;
+
+
 
         public void LoadEngine(string modelPath)
         {
-            if (this._IADEngine != null)
+            /*if (this._IADEngine != null)
                 this._IADEngine.Dispose();
             _IADEngine = new IADEngine(modelPath, 0);
 
@@ -34,6 +42,7 @@ namespace Project_EgennamJO
             option.CalcObjectAreaAndApplyThreshold = true;
             option.CalcTime = true;
             _IADEngine.SetInferenceOption(option);
+            */
 
         }
         public bool InspIAD(Bitmap bmpImage)
@@ -84,6 +93,8 @@ namespace Project_EgennamJO
             DrawIADResult(_IADResult, resultImage);
             return resultImage;
         }
+
+       
         private bool disposed = false;
 
         protected virtual void Dispose(bool disposing)

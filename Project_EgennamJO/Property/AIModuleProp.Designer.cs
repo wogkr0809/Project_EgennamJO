@@ -32,18 +32,19 @@
             this.btnSelAIModel = new System.Windows.Forms.Button();
             this.btnLoadModel = new System.Windows.Forms.Button();
             this.btnInspAI = new System.Windows.Forms.Button();
+            this.cbEngineType = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(33, 28);
+            this.textBox1.Location = new System.Drawing.Point(22, 76);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(442, 28);
             this.textBox1.TabIndex = 0;
             // 
             // btnSelAIModel
             // 
-            this.btnSelAIModel.Location = new System.Drawing.Point(336, 78);
+            this.btnSelAIModel.Location = new System.Drawing.Point(336, 126);
             this.btnSelAIModel.Name = "btnSelAIModel";
             this.btnSelAIModel.Size = new System.Drawing.Size(115, 46);
             this.btnSelAIModel.TabIndex = 1;
@@ -53,26 +54,41 @@
             // 
             // btnLoadModel
             // 
-            this.btnLoadModel.Location = new System.Drawing.Point(336, 130);
+            this.btnLoadModel.Location = new System.Drawing.Point(336, 178);
             this.btnLoadModel.Name = "btnLoadModel";
             this.btnLoadModel.Size = new System.Drawing.Size(115, 41);
             this.btnLoadModel.TabIndex = 2;
             this.btnLoadModel.Text = "모델로딩";
             this.btnLoadModel.UseVisualStyleBackColor = true;
+            this.btnLoadModel.Click += new System.EventHandler(this.btnLoadModel_Click);
             // 
             // btnInspAI
             // 
-            this.btnInspAI.Location = new System.Drawing.Point(336, 177);
+            this.btnInspAI.Location = new System.Drawing.Point(336, 242);
             this.btnInspAI.Name = "btnInspAI";
             this.btnInspAI.Size = new System.Drawing.Size(115, 40);
             this.btnInspAI.TabIndex = 3;
             this.btnInspAI.Text = "AI 검사";
             this.btnInspAI.UseVisualStyleBackColor = true;
+            this.btnInspAI.Click += new System.EventHandler(this.btnInspAI_Click);
+            // 
+            // cbEngineType
+            // 
+            this.cbEngineType.FormattingEnabled = true;
+            this.cbEngineType.Items.AddRange(new object[] {
+            "IAD",
+            "DET",
+            "SGE"});
+            this.cbEngineType.Location = new System.Drawing.Point(22, 23);
+            this.cbEngineType.Name = "cbEngineType";
+            this.cbEngineType.Size = new System.Drawing.Size(442, 26);
+            this.cbEngineType.TabIndex = 4;
             // 
             // AIModuleProp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbEngineType);
             this.Controls.Add(this.btnInspAI);
             this.Controls.Add(this.btnLoadModel);
             this.Controls.Add(this.btnSelAIModel);
@@ -90,5 +106,6 @@
         private System.Windows.Forms.Button btnSelAIModel;
         private System.Windows.Forms.Button btnLoadModel;
         private System.Windows.Forms.Button btnInspAI;
+        private System.Windows.Forms.ComboBox cbEngineType;
     }
 }

@@ -40,6 +40,11 @@ namespace Project_EgennamJO
 
             DoubleBuffered = true;
         }
+        public Bitmap GetCurBitmap()
+        {
+            return _bitmapImage;
+        }
+
         private void ResizeCanvas()
         {
             if (Width <= 0 || Height <= 0 || _bitmapImage == null)
@@ -158,7 +163,7 @@ namespace Project_EgennamJO
             ImageRect.X -= dx;
             ImageRect.Y -= dy;
         }
-
+        #region 좌표계 변환
         private PointF GetScreenOffset()
         {
             return new PointF(ImageRect.X, ImageRect.Y);
@@ -195,6 +200,7 @@ namespace Project_EgennamJO
                 (virtualPos.X * _curZoom) + offset.X,
                 (virtualPos.Y * _curZoom) + offset.Y);
         }
+        #endregion
         private void ImageView_Resize(object sender, EventArgs e)
         {
             ResizeCanvas();
