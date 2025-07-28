@@ -13,7 +13,7 @@ namespace Project_EgennamJO
 {
     public partial class AIModuleProp : UserControl
     {
-
+        private SAIGEAI.EngineType _engineType = SAIGEAI.EngineType.SEG;
         SAIGEAI _saigeAI;
         string _modelPath = string.Empty;
 
@@ -29,13 +29,13 @@ namespace Project_EgennamJO
             switch (selType)
             {
                 case 0:
-                    abc = "AI Files | *.saigeiad;";
+                    abc = "AI Files|*.saigeiad;";
                     break;
                 case 1:
-                    abc = "AI Files | *.saigedet;";
+                    abc = "AI Files|*.saigedet;";
                     break;
                 case 2:
-                    abc = "AI Files | *.saigeseg;";
+                    abc = "AI Files|*.saigeseg;";
                     break;
             }
 
@@ -43,6 +43,7 @@ namespace Project_EgennamJO
             {
                 openFileDialog.Title = "AI 모델 선택";
                 openFileDialog.Multiselect = false;
+                openFileDialog.Filter = abc;
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     _modelPath = openFileDialog.FileName;
@@ -78,6 +79,25 @@ namespace Project_EgennamJO
             _saigeAI.Inspect(bitmap);
             Bitmap resultImage = _saigeAI.GetResultImage();
             Global.Inst.InspStage.UpdateDisplay(resultImage);
+        }
+
+        private void cbEngineList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(cbEngineList.SelectedIndex)
+            {
+                case 0:
+                    _engineType = SAIGEAI.EngineType.IAD;
+                    break;
+                case 1:
+                    _engineType = SAIGEAI.EngineType.DET;
+                    break;
+                case 2:
+                    _engineType = SAIGEAI.EngineType.SEG;
+                    break;
+            }
+            if (_saigeAI == null)
+                _saigeAI = Global.Inst.InspStage.AIModule;
+            _saigeAI.SetEngineType(_engineType);
         }
     }
 }

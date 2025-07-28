@@ -38,12 +38,7 @@ namespace Project_EgennamJO
         }
         public void UpdateDisplay(Bitmap bitmap = null)
         {
-            if (bitmap == null)
-            {
-                bitmap = Global.Inst.InspStage.GetBitmap(0);
-                if (bitmap == null)
-                    return;
-            }
+
             if (imageViewCtrl != null)
                 imageViewCtrl.LoadBitMap(bitmap);
         }
@@ -53,6 +48,7 @@ namespace Project_EgennamJO
 
             if (imageViewCtrl != null)
                 curImage = imageViewCtrl.GetCurBitmap();
+
             return curImage;
             
         }

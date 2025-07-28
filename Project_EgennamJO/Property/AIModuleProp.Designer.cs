@@ -37,18 +37,16 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(23, 48);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBox1.Location = new System.Drawing.Point(33, 72);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(311, 21);
+            this.textBox1.Size = new System.Drawing.Size(443, 28);
             this.textBox1.TabIndex = 0;
             // 
             // btnSelAIModel
             // 
-            this.btnSelAIModel.Location = new System.Drawing.Point(254, 92);
-            this.btnSelAIModel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnSelAIModel.Location = new System.Drawing.Point(363, 138);
             this.btnSelAIModel.Name = "btnSelAIModel";
-            this.btnSelAIModel.Size = new System.Drawing.Size(80, 31);
+            this.btnSelAIModel.Size = new System.Drawing.Size(114, 46);
             this.btnSelAIModel.TabIndex = 1;
             this.btnSelAIModel.Text = "AI모델 선택";
             this.btnSelAIModel.UseVisualStyleBackColor = true;
@@ -56,10 +54,9 @@
             // 
             // btnLoadModel
             // 
-            this.btnLoadModel.Location = new System.Drawing.Point(254, 127);
-            this.btnLoadModel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnLoadModel.Location = new System.Drawing.Point(363, 190);
             this.btnLoadModel.Name = "btnLoadModel";
-            this.btnLoadModel.Size = new System.Drawing.Size(80, 27);
+            this.btnLoadModel.Size = new System.Drawing.Size(114, 40);
             this.btnLoadModel.TabIndex = 2;
             this.btnLoadModel.Text = "모델로딩";
             this.btnLoadModel.UseVisualStyleBackColor = true;
@@ -67,10 +64,9 @@
             // 
             // btnInspAI
             // 
-            this.btnInspAI.Location = new System.Drawing.Point(254, 158);
-            this.btnInspAI.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnInspAI.Location = new System.Drawing.Point(363, 237);
             this.btnInspAI.Name = "btnInspAI";
-            this.btnInspAI.Size = new System.Drawing.Size(80, 27);
+            this.btnInspAI.Size = new System.Drawing.Size(114, 40);
             this.btnInspAI.TabIndex = 3;
             this.btnInspAI.Text = "AI 검사";
             this.btnInspAI.UseVisualStyleBackColor = true;
@@ -83,33 +79,24 @@
             "IAD",
             "DET",
             "SEG"});
-            this.cbEngineList.Location = new System.Drawing.Point(23, 15);
+            this.cbEngineList.Location = new System.Drawing.Point(33, 22);
+            this.cbEngineList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cbEngineList.Name = "cbEngineList";
-            this.cbEngineList.Size = new System.Drawing.Size(311, 20);
+            this.cbEngineList.Size = new System.Drawing.Size(443, 26);
             this.cbEngineList.TabIndex = 4;
-            // 
-            this.cbEngineType.FormattingEnabled = true;
-            this.cbEngineType.Items.AddRange(new object[] {
-            "IAD",
-            "DET",
-            "SGE"});
-            this.cbEngineType.Location = new System.Drawing.Point(22, 23);
-            this.cbEngineType.Name = "cbEngineType";
-            this.cbEngineType.Size = new System.Drawing.Size(442, 26);
-            this.cbEngineType.TabIndex = 4;
+            this.cbEngineList.SelectedIndexChanged += new System.EventHandler(this.cbEngineList_SelectedIndexChanged);
             // 
             // AIModuleProp
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.cbEngineList);
             this.Controls.Add(this.btnInspAI);
             this.Controls.Add(this.btnLoadModel);
             this.Controls.Add(this.btnSelAIModel);
             this.Controls.Add(this.textBox1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "AIModuleProp";
-            this.Size = new System.Drawing.Size(365, 313);
+            this.Size = new System.Drawing.Size(521, 470);
             this.ResumeLayout(false);
             this.PerformLayout();
 

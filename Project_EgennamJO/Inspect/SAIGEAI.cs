@@ -127,39 +127,86 @@ namespace Project_EgennamJO
                     MessageBox.Show("지원하지 않는 엔진 타입입니다.");
                     return false;
             }
+            
             sw.Stop();
             return true;
-           
-
         }
 
-        private void DrawIADResult(IADResult result, Bitmap bmp)
+        private void DrawResult(Bitmap bmp)
         {
+            if (bmp == null)
+                return;
+                
             Graphics g = Graphics.FromImage(bmp);
             int step = 10;
-
-            foreach (var prediction in result.SegmentedObjects)
+            switch (_engineType)
             {
-                SolidBrush brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color));
-                using (GraphicsPath gp = new GraphicsPath())
-                {
-                    if (prediction.Contour.Value.Count < 3) continue;
-                    gp.AddPolygon(prediction.Contour.Value.ToArray());
-                    foreach (var innerValue in prediction.Contour.InnerValue)
+                case EngineType.IAD:
+                    if (_IADResult == null)
+                        return;
+                    foreach(var prediction in _IADResult.SegmentedObjects )
                     {
-                        gp.AddPolygon(innerValue.ToArray());
+                        SolidBrush brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color));
+                        using (GraphicsPath gp = new GraphicsPath())
+                        {
+                            if (prediction.Contour.Value.Count < 3) continue;
+                            gp.AddPolygon(prediction.Contour.Value.ToArray());
+                            foreach (var innerValue in prediction.Contour.InnerValue)
+                            {
+                                gp.AddPolygon(innerValue.ToArray());
+                            }
+                            g.FillPath(brush,gp);
+                        }
+                        step += 50;
                     }
-                    g.FillPath(brush, gp);
-                }
-                step += 50;
+                        break;
+                case EngineType.DET:
+                    if (_DetResult == null) return;
+
+                    foreach (var prediction in _DetResult.DetectedObjects)
+                    {
+                        SolidBrush brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color));
+                        using (GraphicsPath gp = new GraphicsPath())
+                        {
+                            float x = (float)prediction.BoundingBox.X;
+                            float y = (float)prediction.BoundingBox.Y;
+                            float width = (float)prediction.BoundingBox.Width;
+                            float height = (float)prediction.BoundingBox.Height;
+                            gp.AddRectangle(new RectangleF(x, y, width, height));
+                            g.DrawPath(new Pen(brush, 10), gp);
+                        }
+                        step += 50;
+                    }
+                    break;
+                case EngineType.SEG:
+                    if (_SEGResult == null) return;
+
+                    foreach (var prediction in _SEGResult.SegmentedObjects)
+                    {
+                        SolidBrush brush = new SolidBrush(Color.FromArgb(127, prediction.ClassInfo.Color));
+                        using (GraphicsPath gp = new GraphicsPath())
+                        {
+                            if (prediction.Contour.Value.Count < 4) continue;
+                            gp.AddPolygon(prediction.Contour.Value.ToArray());
+                            foreach (var innerValue in prediction.Contour.InnerValue)
+                            {
+                                gp.AddPolygon(innerValue.ToArray());
+                            }
+                            g.FillPath(brush, gp);
+                        }
+                        step += 50;
+                    }
+                    break;
+
             }
         }
         public Bitmap GetResultImage()
         {
-            if (_IADResult == null || _InspImage == null)
+            if (_InspImage == null)
                 return null;
+            
             Bitmap resultImage = _InspImage.Clone(new Rectangle(0, 0, _InspImage.Width, _InspImage.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            DrawIADResult(_IADResult, resultImage);
+            DrawResult(resultImage);
             return resultImage;
         }
 
