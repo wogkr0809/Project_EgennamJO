@@ -16,6 +16,7 @@ namespace Project_EgennamJO
 
         SAIGEAI _saigeAI;
         string _modelPath = string.Empty;
+
         public AIModuleProp()
         {
             InitializeComponent();
@@ -23,30 +24,43 @@ namespace Project_EgennamJO
 
         private void btnSelAIModel_Click(object sender, EventArgs e)
         {
+            int selType = cbEngineList.SelectedIndex;
+            string abc = "AI Files|*.*";
+            switch (selType)
+            {
+                case 0:
+                    abc = "AI Files | *.saigeiad;";
+                    break;
+                case 1:
+                    abc = "AI Files | *.saigedet;";
+                    break;
+                case 2:
+                    abc = "AI Files | *.saigeseg;";
+                    break;
+            }
+
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Title = "AI 모델 선택";
-                openFileDialog.Filter = "AI Files|*.*";
                 openFileDialog.Multiselect = false;
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     _modelPath = openFileDialog.FileName;
                     textBox1.Text = _modelPath;
                 }
-
             }
         }
-
         private void btnLoadModel_Click(object sender, EventArgs e)
         {
-            if(string.IsNullOrEmpty(_modelPath ))
+             if (string.IsNullOrEmpty(_modelPath))
             {
-                MessageBox.Show("모델 파일을 선택해주세요.", "오류", MessageBoxButtons.OK , MessageBoxIcon.Error);
+                MessageBox.Show("모델 파일을 선택해주세요.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if(_saigeAI == null)
+
+            if (_saigeAI == null)
             {
-                _saigeAI = Global.inst.inspStage.AIModule;
+                _saigeAI = Global.Inst.InspStage.AIModule;
             }
 
             _saigeAI.LoadEngine(_modelPath);
@@ -55,17 +69,15 @@ namespace Project_EgennamJO
 
         private void btnInspAI_Click(object sender, EventArgs e)
         {
-            if (_saigeAI == null)
+            if(_saigeAI == null)
             {
                 MessageBox.Show("AI 모듈이 초기화되지 않았습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return; 
+                return;
             }
-            Bitmap bitmap = Global.inst.inspStage.GetCurrentImage();
-            _saigeAI.InspIAD(bitmap);
-
-            Bitmap resultImage = _saigeAI.GetResultImage(); 
-
-            Global.inst.inspStage.UpdateDisplay(resultImage);
+            Bitmap bitmap = Global.Inst.InspStage.GetCurrentImage();
+            _saigeAI.Inspect(bitmap);
+            Bitmap resultImage = _saigeAI.GetResultImage();
+            Global.Inst.InspStage.UpdateDisplay(resultImage);
         }
     }
 }

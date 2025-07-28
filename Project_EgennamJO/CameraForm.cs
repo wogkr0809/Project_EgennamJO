@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_EgennamJO.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -37,10 +38,14 @@ namespace Project_EgennamJO
         }
         public void UpdateDisplay(Bitmap bitmap = null)
         {
-            if (imageViewCtrl == null)
-                return;
-
-            imageViewCtrl.LoadBitMap(bitmap);
+            if (bitmap == null)
+            {
+                bitmap = Global.Inst.InspStage.GetBitmap(0);
+                if (bitmap == null)
+                    return;
+            }
+            if (imageViewCtrl != null)
+                imageViewCtrl.LoadBitMap(bitmap);
         }
         public Bitmap GetDisplayImage()
         {
@@ -49,8 +54,8 @@ namespace Project_EgennamJO
             if (imageViewCtrl != null)
                 curImage = imageViewCtrl.GetCurBitmap();
             return curImage;
+            
         }
-
-
+       
     }
 }

@@ -9,61 +9,130 @@ using SaigeVision.Net.V2;
 using SaigeVision.Net.V2.IAD;
 using System.Windows.Forms;
 using System.Diagnostics;
-using SaigeVision.Net.V2.Detection;
 using SaigeVision.Net.V2.Segmentation;
+using SaigeVision.Net.V2.Detection;
+using System.Runtime.InteropServices;
 
 namespace Project_EgennamJO
 {
-    internal class SAIGEAI : IDisposable
+    public class SAIGEAI : IDisposable
     {
+        public enum EngineType { IAD, SEG, DET };
+        public EngineType _engineType;
+
+        private Dictionary<string, SegmentationResult> _SegmentationResults;
+        private Dictionary<string, IADResult> _IADResults;
+        private Dictionary<string, DetectionResult> _DetectionResults;
+
         IADEngine _IADEngine = null;
         IADResult _IADResult = null;
-
-        Bitmap _InspImage = null;
-
+        SegmentationEngine _SEGEngine = null;
+        SegmentationResult _SEGResult = null;
         DetectionEngine _DetEngine = null;
         DetectionResult _DetResult = null;
 
+        Bitmap _InspImage = null;
+
+        public SAIGEAI()
+        {
+            _SegmentationResults = new Dictionary<string, SegmentationResult>();
+            _IADResults = new Dictionary<string, IADResult>();
+            _DetectionResults = new Dictionary<string, DetectionResult>();
+        }
+        public void SetEngineType(EngineType engineType)
+        {
+            _engineType = engineType;
+        }
 
 
         public void LoadEngine(string modelPath)
         {
-            /*if (this._IADEngine != null)
-                this._IADEngine.Dispose();
-            _IADEngine = new IADEngine(modelPath, 0);
+            _IADEngine?.Dispose();
+            // ?. => null 조건 연산자 IADEngine에 값이 들어오면 실행하고 null인경우 Dispose 실행
+            _SEGEngine?.Dispose();
+            _DetEngine?.Dispose();
 
-            IADOption option = _IADEngine.GetInferenceOption();
+            switch (_engineType)
+            {
+                case EngineType.IAD:
+                    _IADEngine = new IADEngine(modelPath, 0);
+                    var IADOption = _IADEngine.GetInferenceOption();
+                    IADOption.CalcScoremap = false;
+                    IADOption.CalcHeatmap = false;
+                    IADOption.CalcMask = false;
+                    IADOption.CalcObject = true;
+                    IADOption.CalcObjectAreaAndApplyThreshold = true;
+                    IADOption.CalcObjectScoreAndApplyThreshold = true;
+                    IADOption.CalcTime = true;
+                    _IADEngine.SetInferenceOption(IADOption);
+                    break;
+                case EngineType.SEG:
+                    _SEGEngine = new SegmentationEngine(modelPath, 0);
+                    var SegOption = _SEGEngine.GetInferenceOption();
+                    SegOption.CalcTime = true;
+                    SegOption.CalcObject = true;
+                    SegOption.CalcScoremap = false;
+                    SegOption.CalcMask = false;
+                    SegOption.CalcObjectScoreAndApplyThreshold = true;
+                    SegOption.CalcObjectAreaAndApplyThreshold = true;
+                    _SEGEngine.SetInferenceOption(SegOption);
+                    break;
+                case EngineType.DET:
+                    _DetEngine = new DetectionEngine(modelPath, 0);
+                    var DetOption = _DetEngine.GetInferenceOption();
+                    DetOption.CalcTime = true;
+                    _DetEngine.SetInferenceOption(DetOption);
+                    break;
 
-            option.CalcScoremap = false;
-            option.CalcHeatmap = false;
-            option.CalcMask = false;
-            option.CalcObject = true;
-            option.CalcObjectAreaAndApplyThreshold = true;
-            option.CalcObjectAreaAndApplyThreshold = true;
-            option.CalcTime = true;
-            _IADEngine.SetInferenceOption(option);
-            */
+            }
 
         }
-        public bool InspIAD(Bitmap bmpImage)
+        public bool Inspect(Bitmap bmpImage)
         {
-            if (_IADEngine == null)
+            if (bmpImage == null)
             {
-                MessageBox.Show("엔진이 초기화되지 않았습니다.LoadEngine 메서드를 호출하여 엔진을 초기화하세요.");
+                MessageBox.Show("검사할 이미지가 없습니다.");
                 return false;
             }
             _InspImage = bmpImage;
 
             SrImage srImage = new SrImage(bmpImage);
-
             Stopwatch sw = Stopwatch.StartNew();
 
-            _IADResult = _IADEngine.Inspection(srImage);
+            switch (_engineType)
+            {
+                case EngineType.IAD:
+                    if (_IADEngine == null)
+                    {
+                        MessageBox.Show("IAD 엔진이 초기화되지않았습니다.");
+                    }
+                    _IADResult = _IADEngine.Inspection(srImage);
+                    break;
+                case EngineType.DET:
+                    if (_DetEngine == null)
+                    {
+                        MessageBox.Show("DET 엔진이 초기화되지않았습니다.");
+                    }
+                    _DetResult = _DetEngine.Inspection(srImage);
+                    break;
+                case EngineType.SEG:
+                    if (_SEGEngine == null)
+                    {
+                        MessageBox.Show("SEG 엔진이 초기화되지않았습니다.");
+                    }
+                    _SEGResult = _SEGEngine.Inspection(srImage);
+                    break;
 
+                default:
+                    MessageBox.Show("지원하지 않는 엔진 타입입니다.");
+                    return false;
+            }
             sw.Stop();
-
             return true;
+           
+
         }
+
         private void DrawIADResult(IADResult result, Bitmap bmp)
         {
             Graphics g = Graphics.FromImage(bmp);
@@ -103,7 +172,7 @@ namespace Project_EgennamJO
             {
                 if (disposing)
                 {
-                    if(_IADEngine != null)
+                    if (_IADEngine != null)
                         _IADEngine.Dispose();
                 }
             }

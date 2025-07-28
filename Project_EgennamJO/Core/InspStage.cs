@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Project_EgennamJO.Core
 {
-    internal class InspStage : IDisposable
+    public class InspStage : IDisposable
     {
         SAIGEAI _saigeAI;
+        
+        SAIGEAI _saigeAI; // SaigeAI 인스턴스
 
         public InspStage() { }
 
@@ -25,8 +27,10 @@ namespace Project_EgennamJO.Core
 
         public bool Initialize()
         {
+
             return true;
         }
+
         public void UpdateDisplay(Bitmap bitmap)
         {
 
@@ -36,6 +40,7 @@ namespace Project_EgennamJO.Core
                 cameraForm.UpdateDisplay(bitmap);
             }
         }
+
         public Bitmap GetCurrentImage()
         {
             Bitmap bitmap = null;
@@ -44,17 +49,26 @@ namespace Project_EgennamJO.Core
             {
                 bitmap = cameraForm.GetDisplayImage();
             }
+
             return bitmap;
         }
-        private bool disposed = false; 
+
+      
+        #region Disposable
+
+        private bool disposed = false; // to detect redundant calls
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposed)
             {
                 if (disposing)
                 {
-                
+                    // Dispose managed resources.
                 }
+
+                // Dispose unmanaged managed resources.
+
                 disposed = true;
             }
         }
@@ -65,3 +79,4 @@ namespace Project_EgennamJO.Core
         }
     }
 }
+

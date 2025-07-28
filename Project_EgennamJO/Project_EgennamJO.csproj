@@ -81,12 +81,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Global.cs" />
-    <Compile Include="Core\ImageSpace.cs" />
     <Compile Include="Core\InspStage.cs" />
-    <Compile Include="ImageViewCtrl.cs">
+    <Compile Include="UIControl\ImageViewCtrl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ImageViewCtrl.Designer.cs">
+    <Compile Include="UIControl\ImageViewCtrl.Designer.cs">
       <DependentUpon>ImageViewCtrl.cs</DependentUpon>
     </Compile>
     <Compile Include="PropertiesForm.cs">
@@ -140,7 +139,7 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ImageViewCtrl.resx">
+    <EmbeddedResource Include="UIControl\ImageViewCtrl.resx">
       <DependentUpon>ImageViewCtrl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
