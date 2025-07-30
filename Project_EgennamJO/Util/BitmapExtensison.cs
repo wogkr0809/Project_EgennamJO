@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_EgennamJO.Core
+namespace Project_EgennamJO.Util
 {
-    internal class ImageSpace
+    internal class BitmapExtensison
     {
     }
 }

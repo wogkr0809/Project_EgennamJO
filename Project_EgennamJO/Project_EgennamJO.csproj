@@ -53,6 +53,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MvCameraControl.Net">
+      <HintPath>..\Exlib\ExternalLIB\HikRobtCam\MvCameraControl.Net.dll</HintPath>
+    </Reference>
     <Reference Include="SaigeVision.Net.Core.V2, Version=2.5.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Exlib\ExternalLIB\SIAGE\SaigeVision.Net.Core.V2.dll</HintPath>
@@ -81,7 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Global.cs" />
+    <Compile Include="Core\ImageSpace.cs" />
     <Compile Include="Core\InspStage.cs" />
+    <Compile Include="Grab\HikRobotCam.cs" />
     <Compile Include="UIControl\ImageViewCtrl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -133,6 +138,7 @@
     <Compile Include="Property\AIModuleProp.Designer.cs">
       <DependentUpon>AIModuleProp.cs</DependentUpon>
     </Compile>
+    <Compile Include="Util\BitmapExtensison.cs" />
     <EmbeddedResource Include="CameraForm.resx">
       <DependentUpon>CameraForm.cs</DependentUpon>
     </EmbeddedResource>
