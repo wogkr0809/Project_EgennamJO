@@ -88,6 +88,7 @@ namespace Project_EgennamJO.Grab
                     MvGvspPixelType dstPixeType = MvGvspPixelType.PixelType_Gvsp_RGB8_Packed;
 
                     int result = _device.PixelTypeConverter.ConvertPixelType(inputImage, out outImage, dstPixeType);
+
                 }
             }
         }
