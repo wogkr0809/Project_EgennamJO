@@ -58,11 +58,11 @@ namespace Project_EgennamJO.Grab
 
         protected GrabUserBuffer[] _userImageBuffer = null;
 
-        public int BufferIndeex { get; set; } = 0;
+        public int BufferIndex { get; set; } = 0;
         internal bool HardwareTrigger { get; set; } = false;
         internal bool IncreaseBufferIndex { get; set; } = false;
 
-        private IDevice _device = null; 
+        private IDevice _device = null;
 
         void FrameGrabeEventHandler(object sender, FrameGrabbedEventArgs e)
         {
@@ -71,7 +71,26 @@ namespace Project_EgennamJO.Grab
             IFrameOut frameOut = e.FrameOut;
 
             OnGrabCompleted(BufferIndex);
+            if (_userImageBuffer[BufferIndex].ImageBuffer != null)
+            {
+                if (frameOut.Image.PixelType == MvGvspPixelType.PixelType_Gvsp_Mono8)
+                {
+                    if (_userImageBuffer[BufferIndex].ImageBuffer != null)
+                    {
+                        IntPtr ptrSourceTemp = frameOut.Image.PixelDataPtr;
+                        Marshal.Copy(ptrSourceTemp, _userImageBuffer[BufferIndex].ImageBuffer, 0, (int)frameOut.Image.ImageSize);
+                    }
+                }
+                else
+                {
+                    IImage inputImage = frameOut.Image;
+                    IImage outImage;
+                    MvGvspPixelType dstPixeType = MvGvspPixelType.PixelType_Gvsp_RGB8_Packed;
+
+                    int result = _device.PixelTypeConverter.ConvertPixelType(inputImage, out outImage, dstPixeType);
+                }
+            }
         }
-        
+
     }
 }
