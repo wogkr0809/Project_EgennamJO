@@ -13,7 +13,8 @@ namespace Project_EgennamJO.Core
         public static readonly int MAX_GRAB_BUF = 5;
 
         private ImageSpace _imageSpace = null;
-        private HikRobotCam _grabManager = null;
+        private GrabModel _grabManager = null;
+        private CameraType _camType = CameraType.WebCam;
         SAIGEAI _saigeAI;
 
         public InspStage() { }
@@ -36,11 +37,22 @@ namespace Project_EgennamJO.Core
         public bool Initialize()
         {
             _imageSpace = new ImageSpace();
-            _grabManager = new HikRobotCam();
-            if (_grabManager.InitGrab() == true)
+            switch (_camType)
+            {
+                case CameraType.WebCam:
+                    {
+                        _grabManager = new WebCam();
+                        break;
+                    }
+                case CameraType.HikRobotCam:
+                    {
+                        _grabManager = new HikRobotCam();
+                        break;
+                    }
+            }
+            if(_grabManager != null && _grabManager.InitGrab() == true)
             {
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
-
                 InitModerGrab(MAX_GRAB_BUF);
             }
             return true;
@@ -148,10 +160,19 @@ namespace Project_EgennamJO.Core
             {
                 if (disposing)
                 {
-                    // Dispose managed resources.
+                    if (_saigeAI != null)
+                    {
+                        _saigeAI.Dispose();
+                        _saigeAI = null;
+                    }
+                    if(_grabManager != null)
+                    {
+                        _grabManager.Dispose();
+                        _grabManager = null;
+                    }
                 }
 
-                // Dispose unmanaged managed resources.
+                
 
                 disposed = true;
             }
