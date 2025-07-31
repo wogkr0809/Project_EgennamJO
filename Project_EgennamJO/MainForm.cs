@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_EgennamJO.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking; 
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Project_EgennamJO
 {
@@ -17,16 +18,18 @@ namespace Project_EgennamJO
         public MainForm()
         {
             InitializeComponent();
-  
+
             _dockPanel = new DockPanel
             {
                 Dock = DockStyle.Fill
             };
             Controls.Add(_dockPanel);
-            
+
             _dockPanel.Theme = new VS2015BlueTheme();
 
             LoadDockingWindows();
+
+            Global.Inst.Initialize();
         }
         private void LoadDockingWindows()
         {
@@ -34,9 +37,13 @@ namespace Project_EgennamJO
 
             var cameraWindow = new CameraForm();
             cameraWindow.Show(_dockPanel, DockState.Document);
-           
+
+            var runWindow = new RunForm();
+            runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.2);
+
             var propWindow = new PropertiesForm();
             propWindow.Show(_dockPanel, DockState.DockRight);
+
 
         }
         public static T GetDockForm<T>() where T : DockContent
@@ -54,13 +61,18 @@ namespace Project_EgennamJO
             {
                 openFileDialog.Title = "이미지 파일 선택";
                 openFileDialog.Filter = "Image Files|* .bmp;* .jpg;* .jpeg;* .png;* .gif";
-                openFileDialog.Multiselect = false; 
+                openFileDialog.Multiselect = false;
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     string filePath = openFileDialog.FileName;
                     cameraForm.LoadImage(filePath);
                 }
             }
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Global.Inst.Dispose();
         }
     }
 }

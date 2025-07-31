@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_EgennamJO.Grab;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,9 +10,18 @@ namespace Project_EgennamJO.Core
 {
     public class InspStage : IDisposable
     {
+        public static readonly int MAX_GRAB_BUF = 5;
+
+        private ImageSpace _imageSpace = null;
+        private HikRobotCam _grabManager = null;
         SAIGEAI _saigeAI;
 
         public InspStage() { }
+
+        public ImageSpace ImageSpace
+        {
+            get => _imageSpace;
+        }
 
         public SAIGEAI AIModule
         {
@@ -25,10 +35,78 @@ namespace Project_EgennamJO.Core
 
         public bool Initialize()
         {
+            _imageSpace = new ImageSpace();
+            _grabManager = new HikRobotCam();
+            if (_grabManager.InitGrab() == true)
+            {
+                _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
 
+                InitModerGrab(MAX_GRAB_BUF);
+            }
             return true;
         }
+        public void InitModerGrab(int bufferCount)
+        {
+            if (_grabManager == null)
+                return;
 
+            int pixelBpp = 8;
+            _grabManager.GetPixelBpp(out pixelBpp);
+
+            int inspectionWidth;
+            int inspectionHeight; ;
+            int inspectionStride;
+            _grabManager.GetResolution(out inspectionWidth, out inspectionHeight, out inspectionStride);
+
+            if(_imageSpace != null)
+            {
+                _imageSpace.SetImageInfo(pixelBpp, inspectionWidth, inspectionHeight, inspectionStride);
+
+            }
+            SetBuffer(bufferCount);
+        }
+        public void SetBuffer(int bufferCount)
+        {
+            if (_grabManager == null)
+                return;
+            if (_imageSpace.BufferCount == bufferCount)
+                return;
+            _imageSpace.InitImageSpace(bufferCount);
+            _grabManager.InitBuffer(bufferCount);
+
+            for(int i = 0; i < bufferCount; i++)
+            {
+                _grabManager.SetBuffer(
+                    _imageSpace.GetInspectionBuffer(i),
+                    _imageSpace.GetnspectionBufferPtr(i),
+                    _imageSpace.GetInspectionBufferHandle(i), i);
+            }
+        }
+        public void Grab(int bufferIndex)
+        {
+            if (_grabManager == null)
+                return;
+
+            _grabManager.Grab(bufferIndex, true);
+        }
+
+        private void _multiGrab_TransferCompleted(object sender, object e)
+        {
+            int bufferIndex = (int)e;
+            Console.WriteLine($"_multiGrab_TransferCompledted{bufferIndex}");
+
+            _imageSpace.Split(bufferIndex);
+
+            DisplayGarbImage(bufferIndex);
+        }
+        private void DisplayGarbImage(int bufferIndex)
+        {
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if(cameraForm != null)
+            {
+                cameraForm.UpdateDisplay();
+            }
+        }
         public void UpdateDisplay(Bitmap bitmap)
         {
 
@@ -49,6 +127,13 @@ namespace Project_EgennamJO.Core
             }
 
             return bitmap;
+        }
+        public Bitmap GetBitmap(int bufferIndex = -1)
+        {
+            if (Global.Inst.InspStage.ImageSpace is null)
+                return null;
+
+            return Global.Inst.InspStage.ImageSpace.GetBitmap();
         }
 
 
@@ -78,4 +163,4 @@ namespace Project_EgennamJO.Core
         }
     }
 }
-        #endregion
+#endregion

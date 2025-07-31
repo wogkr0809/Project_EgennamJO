@@ -56,6 +56,14 @@
     <Reference Include="MvCameraControl.Net">
       <HintPath>..\Exlib\ExternalLIB\HikRobtCam\MvCameraControl.Net.dll</HintPath>
     </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\jidam\ExternalLib\Dll\OpenCv\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\jidam\ExternalLib\Dll\OpenCv\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="SaigeVision.Net.Core.V2, Version=2.5.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Exlib\ExternalLIB\SIAGE\SaigeVision.Net.Core.V2.dll</HintPath>
@@ -84,11 +92,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Global.cs" />
+    <Compile Include="Core\ImageSpace.cs" />
     <Compile Include="Core\InspStage.cs" />
     <Compile Include="Grab\HikRobotCam.cs" />
-    <Compile Include="obj\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
-    <Compile Include="obj\Release\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
-    <Compile Include="obj\x64\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
+    <Compile Include="RunForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RunForm.Designer.cs">
+      <DependentUpon>RunForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UIControl\ImageViewCtrl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -147,23 +159,9 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.BinaryProp.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.CameraForm.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.Form1.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.ImageViewCtrl.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.MainForm.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.Properties.Resources.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.PropertiesForm.resources" />
-    <EmbeddedResource Include="obj\Debug\Project_EgennamJO.Property.ImageFilterProp.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.AIModuleProp.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.BinaryProp.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.CameraForm.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.Form1.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.ImageViewCtrl.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.MainForm.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.Properties.Resources.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.PropertiesForm.resources" />
-    <EmbeddedResource Include="obj\x64\Debug\Project_EgennamJO.Property.ImageFilterProp.resources" />
+    <EmbeddedResource Include="RunForm.resx">
+      <DependentUpon>RunForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UIControl\ImageViewCtrl.resx">
       <DependentUpon>ImageViewCtrl.cs</DependentUpon>
     </EmbeddedResource>
@@ -191,27 +189,6 @@
     <EmbeddedResource Include="Property\ImageFilterProp.resx">
       <DependentUpon>ImageFilterProp.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="bin\Debug\Project_EgennamJO.exe.config" />
-    <None Include="bin\x64\Debug\Project_EgennamJO.exe.config" />
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
-    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="obj\Debug\Project_.F8B694C5.Up2Date" />
-    <None Include="obj\Debug\Project_EgennamJO.csproj.AssemblyReference.cache" />
-    <None Include="obj\Debug\Project_EgennamJO.csproj.CoreCompileInputs.cache" />
-    <None Include="obj\Debug\Project_EgennamJO.csproj.GenerateResource.cache" />
-    <None Include="obj\Release\Project_EgennamJO.csproj.AssemblyReference.cache" />
-    <None Include="obj\x64\Debug\DesignTimeResolveAssemblyReferences.cache" />
-    <None Include="obj\x64\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="obj\x64\Debug\Project_.F8B694C5.Up2Date" />
-    <None Include="obj\x64\Debug\Project_EgennamJO%28OpenCv%29.csproj.AssemblyReference.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO%28OpenCv%29.csproj.CoreCompileInputs.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO%28OpenCv%29.csproj.GenerateResource.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO%28OpenCv%29.csproj.SuggestedBindingRedirects.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO.csproj.AssemblyReference.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO.csproj.CoreCompileInputs.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO.csproj.GenerateResource.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO.csproj.SuggestedBindingRedirects.cache" />
-    <None Include="obj\x64\Debug\Project_EgennamJO.exe.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -225,40 +202,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="bin\Debug\Project_EgennamJO.exe" />
-    <Content Include="bin\Debug\Project_EgennamJO.pdb" />
-    <Content Include="bin\Debug\WeifenLuo.WinFormsUI.Docking.dll" />
-    <Content Include="bin\Debug\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll" />
-    <Content Include="bin\x64\Debug\OpenCvSharp.Blob.dll" />
-    <Content Include="bin\x64\Debug\OpenCvSharp.dll" />
-    <Content Include="bin\x64\Debug\OpenCvSharp.Extensions.dll" />
-    <Content Include="bin\x64\Debug\OpenCvSharpExtern.dll" />
-    <Content Include="bin\x64\Debug\Project_EgennamJO.exe" />
-    <Content Include="bin\x64\Debug\Project_EgennamJO.pdb" />
-    <Content Include="bin\x64\Debug\SaigeVision.dll" />
-    <Content Include="bin\x64\Debug\SaigeVision.Net.Core.V2.dll" />
-    <Content Include="bin\x64\Debug\SaigeVision.Net.V2.dll" />
-    <Content Include="bin\x64\Debug\SaigeVision_Impl.dll" />
-    <Content Include="bin\x64\Debug\System.Buffers.dll" />
-    <Content Include="bin\x64\Debug\System.Memory.dll" />
-    <Content Include="bin\x64\Debug\System.Numerics.Vectors.dll" />
-    <Content Include="bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.dll" />
-    <Content Include="bin\x64\Debug\WeifenLuo.WinFormsUI.Docking.dll" />
-    <Content Include="bin\x64\Debug\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll" />
-    <Content Include="obj\Debug\Project_EgennamJO.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\Debug\Project_EgennamJO.exe" />
-    <Content Include="obj\Debug\Project_EgennamJO.pdb" />
-    <Content Include="obj\x64\Debug\Project_EgennamJO%28OpenCv%29.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\x64\Debug\Project_EgennamJO.csproj.FileListAbsolute.txt" />
-    <Content Include="obj\x64\Debug\Project_EgennamJO.exe" />
-    <Content Include="obj\x64\Debug\Project_EgennamJO.pdb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="bin\Release\" />
-    <Folder Include="bin\x64\Release\" />
-    <Folder Include="obj\Debug\TempPE\" />
-    <Folder Include="obj\x64\Debug\TempPE\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
