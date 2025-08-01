@@ -91,12 +91,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Alogrithm\BlobAlgorithm.cs" />
+    <Compile Include="Alogrithm\InspAlogrithm.cs" />
     <Compile Include="Core\Global.cs" />
     <Compile Include="Core\ImageSpace.cs" />
     <Compile Include="Core\InspStage.cs" />
+    <Compile Include="Core\PreviewImage.cs" />
     <Compile Include="Grab\GrabModel.cs" />
     <Compile Include="Grab\HikRobotCam.cs" />
     <Compile Include="Grab\WebCam.cs" />
+    <Compile Include="Property\BinaryProp.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Property\BinaryProp.Designer.cs">
+      <DependentUpon>BinaryProp.cs</DependentUpon>
+    </Compile>
     <Compile Include="RunForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -114,12 +123,6 @@
     </Compile>
     <Compile Include="PropertiesForm.Designer.cs">
       <DependentUpon>PropertiesForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Property\BinaryProp.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Property\BinaryProp.Designer.cs">
-      <DependentUpon>BinaryProp.cs</DependentUpon>
     </Compile>
     <Compile Include="CameraForm.cs">
       <SubType>Form</SubType>
@@ -154,12 +157,21 @@
     <Compile Include="Property\AIModuleProp.Designer.cs">
       <DependentUpon>AIModuleProp.cs</DependentUpon>
     </Compile>
+    <Compile Include="UIControl\RangeTrackbar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UIControl\RangeTrackbar.Designer.cs">
+      <DependentUpon>RangeTrackbar.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util\BitmapExtensison.cs" />
     <EmbeddedResource Include="CameraForm.resx">
       <DependentUpon>CameraForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Property\BinaryProp.resx">
+      <DependentUpon>BinaryProp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RunForm.resx">
       <DependentUpon>RunForm.cs</DependentUpon>
@@ -184,9 +196,6 @@
     </Compile>
     <EmbeddedResource Include="Property\AIModuleProp.resx">
       <DependentUpon>AIModuleProp.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Property\BinaryProp.resx">
-      <DependentUpon>BinaryProp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Property\ImageFilterProp.resx">
       <DependentUpon>ImageFilterProp.cs</DependentUpon>

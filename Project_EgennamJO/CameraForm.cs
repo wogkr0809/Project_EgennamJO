@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using OpenCvSharp;
 
 namespace Project_EgennamJO
 {
@@ -48,6 +49,8 @@ namespace Project_EgennamJO
 
             if (imageViewCtrl != null)
                 imageViewCtrl.LoadBitMap(bitmap);
+            Mat curImage = Global.Inst.InspStage.GetMat();
+            Global.Inst.InspStage.Preview.SetImage(curImage);
         }
         public Bitmap GetDisplayImage()
         {
@@ -57,7 +60,10 @@ namespace Project_EgennamJO
                 curImage = imageViewCtrl.GetCurBitmap();
 
             return curImage;
-            
+        }
+        public void UpdateImageViewer()
+        {
+            imageViewCtrl.Invalidate();
         }
        
     }

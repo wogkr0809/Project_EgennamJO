@@ -11,6 +11,8 @@ using WeifenLuo.WinFormsUI.Docking;
 using System.IO;
 using WeifenLuo.WinFormsUI.ThemeVS2015;
 using Project_EgennamJO.Property;
+using Project_EgennamJO.Alogrithm;
+using Project_EgennamJO.Core;
 
 namespace Project_EgennamJO
 {
@@ -44,7 +46,7 @@ namespace Project_EgennamJO
 
             }
 
-            if(_allTabs.TryGetValue(tabName, out TabPage page))
+            if (_allTabs.TryGetValue(tabName, out TabPage page))
             {
                 tabPropControl.TabPages.Add(page);
                 return;
@@ -61,7 +63,7 @@ namespace Project_EgennamJO
             _inspProp.Dock = DockStyle.Fill;
             newTab.Controls.Add(_inspProp);
             tabPropControl.TabPages.Add(newTab);
-            tabPropControl.SelectedTab = newTab; 
+            tabPropControl.SelectedTab = newTab;
 
             _allTabs[tabName] = newTab;
         }
@@ -72,6 +74,8 @@ namespace Project_EgennamJO
             {
                 case PropertyType.Binary:
                     BinaryProp blobProp = new BinaryProp();
+                    blobProp.RangeChange += RangeSlider_RangeChanged;
+                    blobProp.PropertyChanged += PropertyChanged;
                     curProp = blobProp;
                     break;
                 case PropertyType.Filter:
@@ -88,8 +92,36 @@ namespace Project_EgennamJO
             }
             return curProp;
         }
+        public void UpdateProperty(BlobAlgorithm blobAlgorithm)
+        {
+            if (blobAlgorithm is null)
+                return;
+            foreach (TabPage tabPage in tabPropControl.TabPages)
+            {
+                if (tabPage.Controls.Count > 0)
+                {
+                    UserControl uc = tabPage.Controls[0] as UserControl;
+                    if(uc is BinaryProp binaryProp)
+                    {
+                        binaryProp.SetAlgorithm(blobAlgorithm);
+                    }
+                }
+            }
+        }
+        private void RangeSlider_RangeChanged(object sender, RangeChangedEventArgs e)
+        {
+            int lowerValue = e.LowerValue;
+            int upperValue = e.UpperValue;
+            bool invert = e.Invert;
+            ShowBinaryMode showBinMode = e.ShowBinMode;
+            Global.Inst.InspStage.Preview?.SetBinary(lowerValue, upperValue, invert, showBinMode);
+        }
+        private void PropertyChanged(object sender, EventArgs e)
+        {
+            Global.Inst.InspStage.RedrawMainView();
+        }
 
-       
     }
 }
+
 

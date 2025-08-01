@@ -1,10 +1,12 @@
-﻿using Project_EgennamJO.Grab;
+﻿using Project_EgennamJO.Alogrithm;
+using Project_EgennamJO.Grab;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenCvSharp;
 
 namespace Project_EgennamJO.Core
 {
@@ -16,6 +18,9 @@ namespace Project_EgennamJO.Core
         private GrabModel _grabManager = null;
         private CameraType _camType = CameraType.WebCam;
         SAIGEAI _saigeAI;
+
+        BlobAlgorithm _blobAlgorithm = null;
+        private PreviewImage _previewImage = null;
 
         public InspStage() { }
 
@@ -33,10 +38,21 @@ namespace Project_EgennamJO.Core
                 return _saigeAI;
             }
         }
-
+        public BlobAlgorithm BlobAlgorithm
+        {
+            get => _blobAlgorithm;
+        }
+        public PreviewImage Preview
+        {
+            get => _previewImage;
+        }
+        
         public bool Initialize()
         {
             _imageSpace = new ImageSpace();
+
+            _blobAlgorithm = new BlobAlgorithm();
+            _previewImage = new PreviewImage();
             switch (_camType)
             {
                 case CameraType.WebCam:
@@ -76,6 +92,18 @@ namespace Project_EgennamJO.Core
 
             }
             SetBuffer(bufferCount);
+            UpdateProperty();
+        }
+        private void UpdateProperty()
+        {
+            if (BlobAlgorithm is null)
+                return;
+
+            PropertiesForm propertiesForm = MainForm.GetDockForm<PropertiesForm>();
+            if (propertiesForm is null)
+                return;
+
+            propertiesForm.UpdateProperty(BlobAlgorithm);
         }
         public void SetBuffer(int bufferCount)
         {
@@ -147,9 +175,18 @@ namespace Project_EgennamJO.Core
 
             return Global.Inst.InspStage.ImageSpace.GetBitmap();
         }
-
-
-
+        public Mat GetMat()
+        {
+            return Global.Inst.InspStage.ImageSpace.GetMat();
+        }
+        public void RedrawMainView()
+        {
+            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
+            if(cameraForm != null)
+            {
+                cameraForm.UpdateImageViewer();
+            }
+        }
         #region Disposable
 
         private bool disposed = false; // to detect redundant calls
