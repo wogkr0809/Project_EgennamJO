@@ -21,14 +21,14 @@ namespace Project_EgennamJO.Grab
 
         internal override bool Create(string strIpAddr = null)
         {
-            _capture = new VideoCapture(0); // 0번 카메라 (기본 웹캠)
+            _capture = new VideoCapture(0);
             if (_capture == null)
                 return false;
 
             return true;
         }
 
-        internal override bool Grab(int bufferIndex, bool waitDone)
+        public override bool Grab(int bufferIndex, bool waitDone)
         {
             if (_frame is null)
                 _frame = new Mat();
@@ -47,10 +47,7 @@ namespace Project_EgennamJO.Grab
                     {
                         Marshal.Copy(_frame.Data, _userImageBuffer[BufferIndex].ImageBuffer, 0, bufSize); // Mat의 데이터를 byte 배열로 복사
                     }
-                    //else
-                    //{
-                    //    SLogger.Write("Error: Buffer size is too small.", SLogger.LogType.Error);
-                    //}
+            
                 }
 
                 OnTransferCompleted(BufferIndex);

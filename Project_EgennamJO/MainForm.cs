@@ -74,5 +74,11 @@ namespace Project_EgennamJO
         {
             Global.Inst.Dispose();
         }
+
+        private void setupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var setupForm = new SetupForm(); 
+            setupForm.ShowDialog();
+        }
     }
 }

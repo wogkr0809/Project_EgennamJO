@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using OpenCvSharp.Extensions;
 
 namespace Project_EgennamJO.Core
 {
@@ -16,7 +17,28 @@ namespace Project_EgennamJO.Core
 
         private ImageSpace _imageSpace = null;
         private GrabModel _grabManager = null;
-        private CameraType _camType = CameraType.WebCam;
+        private CameraType _camType= CameraType.None;
+        public bool LiveMode { get; set; } = false;
+
+        public void ToggleLiveMode()
+        {
+            LiveMode = !LiveMode;
+
+        }
+
+        public static class SLogger
+        {
+            public static void Write(string msg)
+            {
+                Console.WriteLine(msg);
+            }
+        }
+
+        public CameraType CamType
+        {
+            get => _camType;
+            set => _camType = value;
+        }
         SAIGEAI _saigeAI;
 
         BlobAlgorithm _blobAlgorithm = null;
@@ -46,11 +68,10 @@ namespace Project_EgennamJO.Core
         {
             get => _previewImage;
         }
-        
+
         public bool Initialize()
         {
             _imageSpace = new ImageSpace();
-
             _blobAlgorithm = new BlobAlgorithm();
             _previewImage = new PreviewImage();
             switch (_camType)
@@ -66,12 +87,14 @@ namespace Project_EgennamJO.Core
                         break;
                     }
             }
-            if(_grabManager != null && _grabManager.InitGrab() == true)
+            if (_grabManager != null && _grabManager.InitGrab() == true)
             {
+                _grabManager.TransferCompleted -= _multiGrab_TransferCompleted;
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
                 InitModerGrab(MAX_GRAB_BUF);
+                return true;
             }
-            return true;
+            return false;
         }
         public void InitModerGrab(int bufferCount)
         {
@@ -86,7 +109,7 @@ namespace Project_EgennamJO.Core
             int inspectionStride;
             _grabManager.GetResolution(out inspectionWidth, out inspectionHeight, out inspectionStride);
 
-            if(_imageSpace != null)
+            if (_imageSpace != null)
             {
                 _imageSpace.SetImageInfo(pixelBpp, inspectionWidth, inspectionHeight, inspectionStride);
 
@@ -114,11 +137,11 @@ namespace Project_EgennamJO.Core
             _imageSpace.InitImageSpace(bufferCount);
             _grabManager.InitBuffer(bufferCount);
 
-            for(int i = 0; i < bufferCount; i++)
+            for (int i = 0; i < bufferCount; i++)
             {
                 _grabManager.SetBuffer(
                     _imageSpace.GetInspectionBuffer(i),
-                    _imageSpace.GetnspectionBufferPtr(i),
+                    _imageSpace.GetInspectionBufferPtr(i),
                     _imageSpace.GetInspectionBufferHandle(i), i);
             }
         }
@@ -130,19 +153,29 @@ namespace Project_EgennamJO.Core
             _grabManager.Grab(bufferIndex, true);
         }
 
-        private void _multiGrab_TransferCompleted(object sender, object e)
+        private async void _multiGrab_TransferCompleted(object sender,object e)
         {
             int bufferIndex = (int)e;
-            Console.WriteLine($"_multiGrab_TransferCompledted{bufferIndex}");
-
+            Console.WriteLine($"_multiGrab_TransferCompleted {bufferIndex}");
             _imageSpace.Split(bufferIndex);
+            DisplayGrabImage(bufferIndex);
+            if(_previewImage != null)
+            {
+                Bitmap bitmap = ImageSpace.GetBitmap(0);
+                _previewImage.SetImage(BitmapConverter.ToMat(bitmap));  
+            }
 
-            DisplayGarbImage(bufferIndex);
+            if (LiveMode)
+            {
+                SLogger.Write("Grab");
+                await Task.Delay(100); // FPS 조절 (여기선 약 33fps)
+                _grabManager.Grab(bufferIndex, true); // 다음 프레임 촬영 요청
+            }
         }
-        private void DisplayGarbImage(int bufferIndex)
+        private void DisplayGrabImage(int bufferIndex)
         {
             var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if(cameraForm != null)
+            if (cameraForm != null)
             {
                 cameraForm.UpdateDisplay();
             }
@@ -182,7 +215,7 @@ namespace Project_EgennamJO.Core
         public void RedrawMainView()
         {
             CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
-            if(cameraForm != null)
+            if (cameraForm != null)
             {
                 cameraForm.UpdateImageViewer();
             }
@@ -202,14 +235,14 @@ namespace Project_EgennamJO.Core
                         _saigeAI.Dispose();
                         _saigeAI = null;
                     }
-                    if(_grabManager != null)
+                    if (_grabManager != null)
                     {
                         _grabManager.Dispose();
                         _grabManager = null;
                     }
                 }
 
-                
+
 
                 disposed = true;
             }

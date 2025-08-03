@@ -148,7 +148,7 @@ namespace Project_EgennamJO.Grab
             return true;
         }
 
-        internal override bool Grab(int bufferIndex, bool waitDone)
+        public override bool Grab(int bufferIndex, bool waitDone)
         {
             if (_device == null)
                 return false;

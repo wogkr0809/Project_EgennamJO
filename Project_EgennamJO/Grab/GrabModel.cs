@@ -80,7 +80,7 @@ internal abstract class GrabModel
     protected AutoResetEvent _grabDoneEvent = new AutoResetEvent(false);
 
     internal abstract bool Create(string strIpAddr = null);
-    internal abstract bool Grab(int bufferIndex, bool waitDone);
+    public abstract bool Grab(int bufferIndex, bool waitDone);
     internal abstract bool Open();
     internal abstract bool Close();
     internal virtual bool Reconnect() { return true; }
