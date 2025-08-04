@@ -93,7 +93,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Alogrithm\BlobAlgorithm.cs" />
+    <Compile Include="Alogrithm\DrawInspectInfo.cs" />
     <Compile Include="Alogrithm\InspAlogrithm.cs" />
+    <Compile Include="Core\Define.cs" />
     <Compile Include="Core\Global.cs" />
     <Compile Include="Core\ImageSpace.cs" />
     <Compile Include="Core\InspStage.cs" />

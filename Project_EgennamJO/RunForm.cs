@@ -40,5 +40,11 @@ namespace Project_EgennamJO
                 btnLive.Text = "Live start";
             }
         }
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+
+            Global.Inst.InspStage.TryInspection();
+        }
     }
 }
+

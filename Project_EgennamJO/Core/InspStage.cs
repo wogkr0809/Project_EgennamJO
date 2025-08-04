@@ -17,7 +17,7 @@ namespace Project_EgennamJO.Core
 
         private ImageSpace _imageSpace = null;
         private GrabModel _grabManager = null;
-        private CameraType _camType= CameraType.None;
+        private CameraType _camType= CameraType.WebCam;
         public bool LiveMode { get; set; } = false;
 
         public void ToggleLiveMode()
@@ -144,6 +144,41 @@ namespace Project_EgennamJO.Core
                     _imageSpace.GetInspectionBufferPtr(i),
                     _imageSpace.GetInspectionBufferHandle(i), i);
             }
+        }
+        public void TryInspection()
+        {
+            if (_blobAlgorithm is null)
+                return;
+
+            Mat srcImage = Global.Inst.InspStage.GetMat();
+            _blobAlgorithm.SetInspData(srcImage);
+
+            _blobAlgorithm.InspRect = new Rect(0, 0, srcImage.Width, srcImage.Height);
+
+            if (_blobAlgorithm.DoInspect())
+            {
+                DisplayResult();
+            }
+        }
+        private bool DisplayResult()
+        {
+            if (_blobAlgorithm is null)
+                return false;
+
+            List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
+            int resultCnt = _blobAlgorithm.GetResultRect(out resultArea);
+            if (resultCnt > 0)
+            {
+                //찾은 위치를 이미지상에서 표시
+                var cameraForm = MainForm.GetDockForm<CameraForm>();
+                if (cameraForm != null)
+                {
+                    cameraForm.ResetDisplay();
+                    cameraForm.AddRect(resultArea);
+                }
+            }
+
+            return true;
         }
         public void Grab(int bufferIndex)
         {

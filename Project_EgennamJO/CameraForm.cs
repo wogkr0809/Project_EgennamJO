@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using OpenCvSharp;
+using Project_EgennamJO.Alogrithm;
 
 namespace Project_EgennamJO
 {
@@ -65,6 +66,14 @@ namespace Project_EgennamJO
         {
             imageViewCtrl.Invalidate();
         }
-       
+        public void ResetDisplay()
+        {
+            imageViewCtrl.ResetEntity();
+        }
+        public void AddRect(List<DrawInspectInfo> rectInfos)
+        {
+            imageViewCtrl.AddRect(rectInfos);
+        }
+
     }
 }
