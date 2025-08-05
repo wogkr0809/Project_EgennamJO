@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Project_EgennamJO.Setting
 {
-    internal class SettingXml
+    public class SettingXml
     {
         private const string SETTING_DIR = "Setup";
         private const string SETTING_FILE_NAME = @"Setup\Setting.xml";

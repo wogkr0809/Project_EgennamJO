@@ -1,4 +1,5 @@
 ﻿using Project_EgennamJO.Core;
+using Project_EgennamJO.Grab;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,15 +17,23 @@ namespace Project_EgennamJO
 {
     public partial class RunForm : DockContent
     {
-        public bool LiveMode { get; set; } = false;
         public RunForm()
         {
             InitializeComponent();
         }
-
         private void btnGrab_Click(object sender, EventArgs e)
         {
-            Global.Inst.InspStage.Grab(0);
+            var stage = Global.Inst.InspStage;
+
+            Console.WriteLine($"[RunForm] 촬상 클릭됨. CameraType: {stage.GetCurrentCameraType()}");
+
+            if (stage.GetCurrentCameraType() == CameraType.None)
+            {
+                MessageBox.Show("현재 선택된 카메라가 없습니다.");
+                return;
+            }
+
+            stage.Grab(0);
         }
 
         private void btnLive_Click(object sender, EventArgs e)

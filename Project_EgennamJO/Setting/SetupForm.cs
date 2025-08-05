@@ -1,5 +1,6 @@
 ﻿using Project_EgennamJO.Core;
 using Project_EgennamJO.Grab;
+using Project_EgennamJO.Setting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,37 +15,37 @@ namespace Project_EgennamJO
 {
     public partial class SetupForm : Form
     {
+        public enum SettingType
+        {
+            SettingPath = 0,
+            SettingCamera
+        }
         public SetupForm()
         {
             InitializeComponent();
 
-            cbCameralist.Items.Add("None");
-            cbCameralist.Items.Add("WebCam");
-            cbCameralist.Items.Add("HikRobotCam");
-
-            cbCameralist.SelectedIndex = 0;
-
-
+            InitTabControl();
         }
-
-        private void btnApply_Click(object sender, EventArgs e)
+        private void InitTabControl()
         {
-            CameraType selectedType = CameraType.None;
-            switch (cbCameralist.SelectedItem.ToString())
+            CameraSetting cameraSetting = new CameraSetting();
+            AddTabControl(cameraSetting, "Camera");
+
+            PathSetting pathSetting = new PathSetting();
+            AddTabControl(pathSetting, "Path");
+
+            tabSetting.SelectTab(0);
+        }
+        private void AddTabControl(UserControl control, string tabName)
+        {
+            TabPage newTab = new TabPage(tabName);
             {
-                case "None": selectedType = CameraType.None; break;
-                case "WebCam": selectedType = CameraType.WebCam; break;
-                case "HikRobotCam": selectedType = CameraType.HikRobotCam; break;
+                Dock = DockStyle.Fill;
             }
-
-            // InspStage에 설정된 카메라 타입 반영
-            Global.Inst.InspStage.CamType = selectedType;
-
-            // 설정된 카메라로 다시 초기화
-            Global.Inst.InspStage.Initialize();
-
-            MessageBox.Show("카메라 설정 완료");
-            this.Close();
+            ;
+            control.Dock = DockStyle.Fill;
+            newTab.Controls.Add(control);
+            tabSetting.TabPages.Add(newTab);
         }
     }
 }

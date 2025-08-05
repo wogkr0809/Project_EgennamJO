@@ -31,7 +31,9 @@ namespace Project_EgennamJO.Core
         private Model _model = null;
 
         private InspWindow _selectedInspWindow = null;
-        
+
+        public bool LiveMode { get; set; } = false;
+
         public void ToggleLiveMode()
         {
             LiveMode = !LiveMode;
@@ -44,12 +46,6 @@ namespace Project_EgennamJO.Core
             {
                 Console.WriteLine(msg);
             }
-        }
-
-        public CameraType CamType
-        {
-            get => _camType;
-            set => _camType = value;
         }
         public InspStage() { }
 
@@ -76,15 +72,47 @@ namespace Project_EgennamJO.Core
         {
             get => _model;
         }
+        public CameraType GetCurrentCameraType()
+        {
+            return _camType;
+        }
 
-        public bool LiveMode { get; set; } = false;
+        public void SetCameraType(CameraType camType)
+        {
+            if (_camType == camType)
+                return;
+
+            _camType = camType;
+
+            _grabManager?.Dispose();
+            _grabManager = null;
+
+            switch (_camType)
+            {
+                case CameraType.WebCam:
+                    _grabManager = new WebCam();
+                    break;
+                case CameraType.HikRobotCam:
+                    _grabManager = new HikRobotCam();
+                    break;
+                case CameraType.None:
+                    return;
+            }
+
+            if (_grabManager.InitGrab())
+            {
+                _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
+                InitModerGrab(MAX_GRAB_BUF);
+            }
+        }
         public bool Initialize()
         {
             _imageSpace = new ImageSpace();
-            
             _previewImage = new PreviewImage();
 
             _model = new Model();
+
+            LoadSetting();
 
             switch (_camType)
             {

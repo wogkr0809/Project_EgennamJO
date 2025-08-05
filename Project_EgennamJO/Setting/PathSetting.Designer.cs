@@ -30,8 +30,8 @@
         {
             this.lbModeDir = new System.Windows.Forms.Label();
             this.IbImageDir = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.txtModelDir = new System.Windows.Forms.TextBox();
+            this.txtImageDir = new System.Windows.Forms.TextBox();
             this.btnSelModeDir = new System.Windows.Forms.Button();
             this.btnSelImageDir = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
@@ -40,75 +40,86 @@
             // lbModeDir
             // 
             this.lbModeDir.AutoSize = true;
-            this.lbModeDir.Location = new System.Drawing.Point(22, 40);
+            this.lbModeDir.Location = new System.Drawing.Point(18, 33);
+            this.lbModeDir.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.lbModeDir.Name = "lbModeDir";
-            this.lbModeDir.Size = new System.Drawing.Size(86, 18);
+            this.lbModeDir.Size = new System.Drawing.Size(72, 15);
             this.lbModeDir.TabIndex = 0;
             this.lbModeDir.Text = "모델 경로";
             // 
             // IbImageDir
             // 
             this.IbImageDir.AutoSize = true;
-            this.IbImageDir.Location = new System.Drawing.Point(13, 79);
+            this.IbImageDir.Location = new System.Drawing.Point(10, 66);
+            this.IbImageDir.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.IbImageDir.Name = "IbImageDir";
-            this.IbImageDir.Size = new System.Drawing.Size(104, 18);
+            this.IbImageDir.Size = new System.Drawing.Size(87, 15);
             this.IbImageDir.TabIndex = 1;
             this.IbImageDir.Text = "이미지 경로";
             // 
-            // textBox1
+            // txtModelDir
             // 
-            this.textBox1.Location = new System.Drawing.Point(123, 30);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(249, 28);
-            this.textBox1.TabIndex = 2;
+            this.txtModelDir.Location = new System.Drawing.Point(98, 25);
+            this.txtModelDir.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtModelDir.Name = "txtModelDir";
+            this.txtModelDir.Size = new System.Drawing.Size(200, 25);
+            this.txtModelDir.TabIndex = 2;
             // 
-            // textBox2
+            // txtImageDir
             // 
-            this.textBox2.Location = new System.Drawing.Point(123, 73);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(249, 28);
-            this.textBox2.TabIndex = 3;
+            this.txtImageDir.Location = new System.Drawing.Point(98, 61);
+            this.txtImageDir.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtImageDir.Name = "txtImageDir";
+            this.txtImageDir.Size = new System.Drawing.Size(200, 25);
+            this.txtImageDir.TabIndex = 3;
             // 
             // btnSelModeDir
             // 
-            this.btnSelModeDir.Location = new System.Drawing.Point(394, 28);
+            this.btnSelModeDir.Location = new System.Drawing.Point(315, 23);
+            this.btnSelModeDir.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSelModeDir.Name = "btnSelModeDir";
-            this.btnSelModeDir.Size = new System.Drawing.Size(65, 28);
+            this.btnSelModeDir.Size = new System.Drawing.Size(52, 23);
             this.btnSelModeDir.TabIndex = 4;
             this.btnSelModeDir.Text = "...";
             this.btnSelModeDir.UseVisualStyleBackColor = true;
+            this.btnSelModeDir.Click += new System.EventHandler(this.btnSelModeDir_Click);
             // 
             // btnSelImageDir
             // 
-            this.btnSelImageDir.Location = new System.Drawing.Point(394, 73);
+            this.btnSelImageDir.Location = new System.Drawing.Point(315, 61);
+            this.btnSelImageDir.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSelImageDir.Name = "btnSelImageDir";
-            this.btnSelImageDir.Size = new System.Drawing.Size(65, 30);
+            this.btnSelImageDir.Size = new System.Drawing.Size(52, 25);
             this.btnSelImageDir.TabIndex = 5;
             this.btnSelImageDir.Text = "...";
             this.btnSelImageDir.UseVisualStyleBackColor = true;
+            this.btnSelImageDir.Click += new System.EventHandler(this.btnSelImageDir_Click);
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(383, 122);
+            this.btnApply.Location = new System.Drawing.Point(306, 102);
+            this.btnApply.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(89, 39);
+            this.btnApply.Size = new System.Drawing.Size(71, 32);
             this.btnApply.TabIndex = 6;
             this.btnApply.Text = "적용";
             this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
             // PathSetting
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnSelImageDir);
             this.Controls.Add(this.btnSelModeDir);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtImageDir);
+            this.Controls.Add(this.txtModelDir);
             this.Controls.Add(this.IbImageDir);
             this.Controls.Add(this.lbModeDir);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "PathSetting";
-            this.Size = new System.Drawing.Size(501, 186);
+            this.Size = new System.Drawing.Size(401, 155);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,8 +129,8 @@
 
         private System.Windows.Forms.Label lbModeDir;
         private System.Windows.Forms.Label IbImageDir;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox txtModelDir;
+        private System.Windows.Forms.TextBox txtImageDir;
         private System.Windows.Forms.Button btnSelModeDir;
         private System.Windows.Forms.Button btnSelImageDir;
         private System.Windows.Forms.Button btnApply;
