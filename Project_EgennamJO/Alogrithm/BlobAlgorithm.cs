@@ -66,6 +66,36 @@ namespace Project_EgennamJO.Alogrithm
             InspectType = InspectType.InspBinary;
             BinThreshold = new BinaryThreshold(100, 200, false);
         }
+
+        public override InspAlgorithm Clone()
+        {
+            var cloneAlgo = new BlobAlgorithm();
+
+            this.CopyBaseTo(cloneAlgo);
+
+            cloneAlgo.CopyFrom(this);
+
+            return cloneAlgo;
+        }
+        public override bool CopyFrom(InspAlgorithm sourceAlgo)
+        {
+            BlobAlgorithm blobAlgo = (BlobAlgorithm)sourceAlgo;
+
+            this.BinThreshold = blobAlgo.BinThreshold;
+            this.BinMethod = blobAlgo.BinMethod;
+            this.UseRotatedRect = blobAlgo.UseRotatedRect;
+
+            this.BlobFilters = blobAlgo.BlobFilters
+                .Select(b => new BlobFilter
+                {
+                    name = b.name,
+                    isUse = b.isUse,
+                    min = b.min,
+                    max = b.max
+                })
+                .ToList();
+            return true;
+        }
         public void SetDefault()
         {
             BlobFilter areaFilter = new BlobFilter()
@@ -164,7 +194,7 @@ namespace Project_EgennamJO.Alogrithm
             string blobInfo;
             blobInfo = $"Blob X:{blobRect.X}, Y:{blobRect.Y}, Size({blobRect.Width},{blobRect.Height})";
             ResultString.Add(blobInfo);
-            
+
             DrawInspectInfo rectInfo = new DrawInspectInfo(blobRect, featureInfo, InspectType.InspBinary, DecisionType.Info);
             _findArea.Add(rectInfo);
 

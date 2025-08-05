@@ -35,8 +35,10 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "ImageViewCtrl";
-            //this.Paint += new System.Windows.Forms.PaintEventHandler(this.ImageViewCtrl_Paint);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseDobuleClik);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ImageViewCtrl_MouseUp);
             this.Resize += new System.EventHandler(this.ImageView_Resize);
             this.ResumeLayout(false);
 

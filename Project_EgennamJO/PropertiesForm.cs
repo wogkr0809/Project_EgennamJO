@@ -13,15 +13,10 @@ using WeifenLuo.WinFormsUI.ThemeVS2015;
 using Project_EgennamJO.Property;
 using Project_EgennamJO.Alogrithm;
 using Project_EgennamJO.Core;
+using Project_EgennamJO.Teach;
 
 namespace Project_EgennamJO
 {
-    public enum PropertyType
-    {
-        Binary,
-        Filter,
-        AIModule
-    }
 
     public partial class PropertiesForm : DockContent
     {
@@ -31,11 +26,8 @@ namespace Project_EgennamJO
         {
             InitializeComponent();
 
-            LoadOptionControl(PropertyType.Filter);
-            LoadOptionControl(PropertyType.Binary);
-            LoadOptionControl(PropertyType.AIModule);
         }
-        private void LoadOptionControl(PropertyType propType)
+        private void LoadOptionControl(InspectType propType)
         {
             string tabName = propType.ToString();
 
@@ -67,22 +59,24 @@ namespace Project_EgennamJO
 
             _allTabs[tabName] = newTab;
         }
-        private UserControl CreateUserControl(PropertyType propType)
+        private UserControl CreateUserControl(InspectType inspPropType)
         {
             UserControl curProp = null;
-            switch (propType)
+            switch (inspPropType)
             {
-                case PropertyType.Binary:
+                case InspectType.InspBinary:
                     BinaryProp blobProp = new BinaryProp();
+
+                    //#7_BINARY_PREVIEW#8 이진화 속성 변경시 발생하는 이벤트 추가
                     blobProp.RangeChange += RangeSlider_RangeChanged;
-                    blobProp.PropertyChanged += PropertyChanged;
+                    //blobProp.PropertyChanged += PropertyChanged;
                     curProp = blobProp;
                     break;
-                case PropertyType.Filter:
+                case InspectType.InspFilter:
                     ImageFilterProp filterProp = new ImageFilterProp();
                     curProp = filterProp;
                     break;
-                case PropertyType.AIModule:
+                case InspectType.InspAIModule:
                     AIModuleProp aiModuleProp = new AIModuleProp();
                     curProp = aiModuleProp;
                     break;
@@ -91,19 +85,38 @@ namespace Project_EgennamJO
                     return null;
             }
             return curProp;
+            
         }
-        public void UpdateProperty(BlobAlgorithm blobAlgorithm)
+        public void ShowProperty(InspWindow window)
         {
-            if (blobAlgorithm is null)
+            foreach (InspAlgorithm algo in window.AlgorithmList)
+            {
+                LoadOptionControl(algo.InspectType);
+            }
+        }
+        public void ResetProperty()
+        {
+            tabPropControl.TabPages.Clear();
+        }
+
+        public void UpdateProperty(InspWindow window)
+        {
+            if (window is null)
                 return;
+
             foreach (TabPage tabPage in tabPropControl.TabPages)
             {
                 if (tabPage.Controls.Count > 0)
                 {
                     UserControl uc = tabPage.Controls[0] as UserControl;
-                    if(uc is BinaryProp binaryProp)
+
+                    if (uc is BinaryProp binaryProp)
                     {
-                        binaryProp.SetAlgorithm(blobAlgorithm);
+                        BlobAlgorithm blobAlgo = (BlobAlgorithm)window.FindInspAlgorithm(InspectType.InspBinary);
+                        if (blobAlgo is null)
+                            continue;
+
+                        binaryProp.SetAlgorithm(blobAlgo);
                     }
                 }
             }
@@ -114,7 +127,7 @@ namespace Project_EgennamJO
             int upperValue = e.UpperValue;
             bool invert = e.Invert;
             ShowBinaryMode showBinMode = e.ShowBinMode;
-            Global.Inst.InspStage.Preview?.SetBinary(lowerValue, upperValue, invert, showBinMode);
+            Global.Inst.InspStage.PreView?.SetBinary(lowerValue, upperValue, invert, showBinMode);
         }
         private void PropertyChanged(object sender, EventArgs e)
         {

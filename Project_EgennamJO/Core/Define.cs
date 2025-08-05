@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace Project_EgennamJO.Core
 {
+    public enum InspWindowType
+    {
+        None = 0,
+        Base, 
+        Body,
+        Sub
+    }
     public enum DecisionType
     {
         None = 0,

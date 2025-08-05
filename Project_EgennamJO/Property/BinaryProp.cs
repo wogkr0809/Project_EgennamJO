@@ -23,7 +23,7 @@ namespace Project_EgennamJO.Property
     }
     public partial class BinaryProp : UserControl
     {
-        public event EventHandler<EventArgs> PropertyChanged;
+       
 
         public event EventHandler<RangeChangedEventArgs> RangeChange;
 

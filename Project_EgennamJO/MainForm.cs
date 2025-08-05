@@ -39,7 +39,10 @@ namespace Project_EgennamJO
             cameraWindow.Show(_dockPanel, DockState.Document);
 
             var runWindow = new RunForm();
-            runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.2);
+            runWindow.Show(cameraWindow.Pane, DockAlignment.Bottom, 0.3);
+
+            var modelTreeWindow = new ModelTreeForm();
+            modelTreeWindow.Show(runWindow.Pane, DockAlignment.Right, 0.3);
 
             var propWindow = new PropertiesForm();
             propWindow.Show(_dockPanel, DockState.DockRight);

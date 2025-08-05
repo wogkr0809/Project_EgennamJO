@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using Project_EgennamJO.Property;
+using Project_EgennamJO.Teach;
 
 namespace Project_EgennamJO.Core
 {
@@ -14,6 +15,8 @@ namespace Project_EgennamJO.Core
     {
         private Mat _orinalImage = null;
         private Mat _previewImage = null;
+
+        private InspWindow _inspWindow = null;
         private bool _usePreview = true;
 
         public void SetImage(Mat image)
@@ -22,6 +25,10 @@ namespace Project_EgennamJO.Core
             _previewImage = new Mat();
         }
 
+        public void SetInspWindow(InspWindow inspwindow)
+        {
+            _inspWindow = inspwindow;
+        }
         public void SetBinary(int lowerValue, int uppeValue, bool invert, ShowBinaryMode showBinMode )
         {
             if (_usePreview == false)
@@ -41,6 +48,10 @@ namespace Project_EgennamJO.Core
             }
             Rect windowArea = new Rect(0, 0, _orinalImage.Width, _orinalImage.Height);
 
+            if (_inspWindow != null)
+            {
+                windowArea = _inspWindow.WindowArea;
+            }
             Mat orgRoi = _orinalImage[windowArea];
 
             Mat grayImage = new Mat();

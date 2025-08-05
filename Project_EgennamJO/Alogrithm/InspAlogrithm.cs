@@ -11,7 +11,9 @@ namespace Project_EgennamJO.Alogrithm
     {
         InspNone = -1,
         InspBinary,
-        InspCoount
+        InspFilter,
+        InspAIModule,
+        InspCount
     }
     public abstract class InspAlgorithm
     {
@@ -26,6 +28,19 @@ namespace Project_EgennamJO.Alogrithm
         protected Mat _srcImage = null;
         public List<string> ResultString { get; set; } = new List<string>();
         public bool IsDefect { get; set; }
+
+        public abstract InspAlgorithm Clone();
+
+        public abstract bool CopyFrom(InspAlgorithm sourceAlog);
+
+        protected void CopyBaseTo(InspAlgorithm target)
+        {
+            target.InspectType = this.InspectType;
+            target.IsUse = this.IsUse;
+            target.IsInspected = this.IsInspected;
+            target.TeachRect = this.TeachRect;  
+            target.InspRect = this.InspRect;
+        }
         public virtual void SetInspData(Mat srcImage)
         {
             _srcImage = srcImage;

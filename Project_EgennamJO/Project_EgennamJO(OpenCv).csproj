@@ -103,6 +103,12 @@
     <Compile Include="Grab\GrabModel.cs" />
     <Compile Include="Grab\HikRobotCam.cs" />
     <Compile Include="Grab\WebCam.cs" />
+    <Compile Include="ModelTreeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ModelTreeForm.Designer.cs">
+      <DependentUpon>ModelTreeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Property\BinaryProp.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -134,6 +140,10 @@
     <Compile Include="Setting\SetupForm.Designer.cs">
       <DependentUpon>SetupForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Teach\DiagramEntity.cs" />
+    <Compile Include="Teach\InspWindow.cs" />
+    <Compile Include="Teach\InspWindowFactory.cs" />
+    <Compile Include="Teach\Model.cs" />
     <Compile Include="UIControl\ImageViewCtrl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -192,6 +202,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ModelTreeForm.resx">
+      <DependentUpon>ModelTreeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Property\BinaryProp.resx">
       <DependentUpon>BinaryProp.cs</DependentUpon>
