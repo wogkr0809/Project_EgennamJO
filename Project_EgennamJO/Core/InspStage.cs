@@ -20,7 +20,7 @@ namespace Project_EgennamJO.Core
         private ImageSpace _imageSpace = null;
 
         private GrabModel _grabManager = null;
-        private CameraType _camType= CameraType.WebCam;
+        private CameraType _camType = CameraType.WebCam;
 
         SAIGEAI _saigeAI;
 
@@ -160,7 +160,7 @@ namespace Project_EgennamJO.Core
 
             }
             SetBuffer(bufferCount);
-            
+
         }
         private void UpdateProperty(InspWindow inspWindow)
         {
@@ -172,6 +172,60 @@ namespace Project_EgennamJO.Core
                 return;
 
             propertiesForm.UpdateProperty(inspWindow);
+        }
+        public void UpdateTeachingImage(int index)
+        {
+            if (_selectedInspWindow is null)
+                return;
+            SetTeachingImage(_selectedInspWindow, index);
+        }
+        public void DelTeachingImage(int index)
+        {
+            if (_selectedInspWindow is null)
+                return;
+            InspWindow inspWindow = _selectedInspWindow;
+
+            inspWindow.DelWindowImage(index); ;
+
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if (matchAlgo != null)
+            {
+                UpdateProperty(inspWindow);
+            }
+        }
+        public void SetTeachingImage(InspWindow inspWindow, int index = -1)
+        {
+            if (inspWindow is null)
+                return;
+
+            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm is null)
+                return;
+
+            Mat curImage = cameraForm.GetDisplayImage();
+            if (curImage is null)
+                return;
+
+            if (inspWindow.WindowArea.Right >= curImage.Width ||
+                inspWindow.WindowArea.Bottom >= curImage.Height)
+            {
+                Console.Write("Roi 영역이 잘못되었습니다!");
+                return;
+            }
+            Mat windowImage = curImage[inspWindow.WindowArea];
+
+            if (index < 0)
+                inspWindow.AddWindowImage(windowImage);
+            else
+                inspWindow.SetWindowImage(windowImage, index);
+
+            inspWindow.IsPatternLearn = false;
+
+            MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
+            if(matchAlgo != null)
+            {
+                UpdateProperty(inspWindow);
+            }    
         }
 
         public void SetBuffer(int bufferCount)
@@ -205,7 +259,7 @@ namespace Project_EgennamJO.Core
 
             Rect windowArea = inspWindow.WindowArea;
 
-            foreach(var inspAlgo in inspWindow.AlgorithmList)
+            foreach (var inspAlgo in inspWindow.AlgorithmList)
             {
                 inspAlgo.TeachRect = windowArea;
                 inspAlgo.InspRect = windowArea;
@@ -221,7 +275,7 @@ namespace Project_EgennamJO.Core
                             Mat srcImage = Global.Inst.InspStage.GetMat();
                             blobAlgo.SetInspData(srcImage);
 
-                            if(blobAlgo.DoInspect())
+                            if (blobAlgo.DoInspect())
                             {
                                 List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
                                 int resultCnt = blobAlgo.GetResultRect(out resultArea);
@@ -258,9 +312,9 @@ namespace Project_EgennamJO.Core
             _selectedInspWindow = inspWindow;
 
             var propForm = MainForm.GetDockForm<PropertiesForm>();
-            if(propForm != null)
+            if (propForm != null)
             {
-                if(inspWindow is null)
+                if (inspWindow is null)
                 {
                     propForm.ResetProperty();
                     return;
@@ -279,6 +333,8 @@ namespace Project_EgennamJO.Core
 
             inspWindow.WindowArea = rect;
             inspWindow.IsTeach = false;
+
+            SetTeachingImage(inspWindow);
             UpdateProperty(inspWindow);
             UpdateDiagramEntity();
 
@@ -367,16 +423,16 @@ namespace Project_EgennamJO.Core
             _grabManager.Grab(bufferIndex, true);
         }
 
-        private async void _multiGrab_TransferCompleted(object sender,object e)
+        private async void _multiGrab_TransferCompleted(object sender, object e)
         {
             int bufferIndex = (int)e;
             Console.WriteLine($"_multiGrab_TransferCompleted {bufferIndex}");
             _imageSpace.Split(bufferIndex);
             DisplayGrabImage(bufferIndex);
-            if(_previewImage != null)
+            if (_previewImage != null)
             {
                 Bitmap bitmap = ImageSpace.GetBitmap(0);
-                _previewImage.SetImage(BitmapConverter.ToMat(bitmap));  
+                _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
             }
 
             if (LiveMode)
@@ -403,18 +459,7 @@ namespace Project_EgennamJO.Core
                 cameraForm.UpdateDisplay(bitmap);
             }
         }
-
-        public Bitmap GetCurrentImage()
-        {
-            Bitmap bitmap = null;
-            var cameraForm = MainForm.GetDockForm<CameraForm>();
-            if (cameraForm != null)
-            {
-                bitmap = cameraForm.GetDisplayImage();
-            }
-
-            return bitmap;
-        }
+        
         public Bitmap GetBitmap(int bufferIndex = -1)
         {
             if (Global.Inst.InspStage.ImageSpace is null)
@@ -422,7 +467,7 @@ namespace Project_EgennamJO.Core
 
             return Global.Inst.InspStage.ImageSpace.GetBitmap();
         }
-        public Mat GetMat()
+        public Mat GetMat(int bufferIndex = -1, eImageChannel imageChannel = eImageChannel.None)
         {
             return Global.Inst.InspStage.ImageSpace.GetMat();
         }

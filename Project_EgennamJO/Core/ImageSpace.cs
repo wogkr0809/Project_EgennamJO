@@ -14,6 +14,7 @@ namespace Project_EgennamJO.Core
 {
     public enum eImageChannel : int
     {
+        None= -1,
         Color,
         Gray,
         Red,
@@ -367,7 +368,7 @@ namespace Project_EgennamJO.Core
             if (_imageInfo.Count <= index)
                 return null;
 
-            if (channel == eImageChannel.Gray)
+            if (channel == eImageChannel.Color)
             {
                 return _imageInfo[index].ToMat();
             }

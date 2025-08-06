@@ -87,17 +87,13 @@ namespace Project_EgennamJO
             Mat curImage = Global.Inst.InspStage.GetMat();
             Global.Inst.InspStage.PreView.SetImage(curImage);
         }
-        public Bitmap GetDisplayImage()
+        public Mat GetDisplayImage()
         {
-            Bitmap curImage = null;
-
-            if (imageViewCtrl != null)
-                curImage = imageViewCtrl.GetCurBitmap();
-
-            return curImage;
+            return Global.Inst.InspStage.ImageSpace.GetMat();
         }
         public void UpdateImageViewer()
         {
+            imageViewCtrl.UpdateInspParam();
             imageViewCtrl.Invalidate();
         }
         public void UpdateDiagramEntity()

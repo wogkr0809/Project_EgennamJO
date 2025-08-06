@@ -70,14 +70,23 @@ namespace Project_EgennamJO
 
         private void btnInspAI_Click(object sender, EventArgs e)
         {
-            if(_saigeAI == null)
+            if (_saigeAI == null)
             {
                 MessageBox.Show("AI 모듈이 초기화되지 않았습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            Bitmap bitmap = Global.Inst.InspStage.GetCurrentImage();
+
+            Bitmap bitmap = Global.Inst.InspStage.GetBitmap();
+            if (bitmap is null)
+            {
+                MessageBox.Show("현재 이미지가 없습니다.", "오류", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             _saigeAI.Inspect(bitmap);
+
             Bitmap resultImage = _saigeAI.GetResultImage();
+
             Global.Inst.InspStage.UpdateDisplay(resultImage);
         }
 
