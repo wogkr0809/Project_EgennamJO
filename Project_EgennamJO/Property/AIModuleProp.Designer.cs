@@ -28,19 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtAIModelPath = new System.Windows.Forms.TextBox();
             this.btnSelAIModel = new System.Windows.Forms.Button();
             this.btnLoadModel = new System.Windows.Forms.Button();
             this.btnInspAI = new System.Windows.Forms.Button();
             this.cbEngineList = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
-            // textBox1
+            // txtAIModelPath
             // 
-            this.textBox1.Location = new System.Drawing.Point(33, 72);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(443, 28);
-            this.textBox1.TabIndex = 0;
+            this.txtAIModelPath.Location = new System.Drawing.Point(33, 72);
+            this.txtAIModelPath.Name = "txtAIModelPath";
+            this.txtAIModelPath.Size = new System.Drawing.Size(443, 28);
+            this.txtAIModelPath.TabIndex = 0;
             // 
             // btnSelAIModel
             // 
@@ -80,7 +80,7 @@
             "DET",
             "SEG"});
             this.cbEngineList.Location = new System.Drawing.Point(33, 22);
-            this.cbEngineList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cbEngineList.Margin = new System.Windows.Forms.Padding(4);
             this.cbEngineList.Name = "cbEngineList";
             this.cbEngineList.Size = new System.Drawing.Size(443, 26);
             this.cbEngineList.TabIndex = 4;
@@ -94,7 +94,7 @@
             this.Controls.Add(this.btnInspAI);
             this.Controls.Add(this.btnLoadModel);
             this.Controls.Add(this.btnSelAIModel);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtAIModelPath);
             this.Name = "AIModuleProp";
             this.Size = new System.Drawing.Size(521, 470);
             this.ResumeLayout(false);
@@ -104,7 +104,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtAIModelPath;
         private System.Windows.Forms.Button btnSelAIModel;
         private System.Windows.Forms.Button btnLoadModel;
         private System.Windows.Forms.Button btnInspAI;

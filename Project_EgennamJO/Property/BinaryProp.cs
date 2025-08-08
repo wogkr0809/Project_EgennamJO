@@ -1,4 +1,5 @@
 ﻿using Project_EgennamJO.Alogrithm;
+using Project_EgennamJO.Core;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,9 +25,10 @@ namespace Project_EgennamJO.Property
     }
     public partial class BinaryProp : UserControl
     {
-       
 
-        public event EventHandler<RangeChangedEventArgs> RangeChange;
+        public event EventHandler<ImageChannelEventArgs> ImageChannelChanged;
+
+        public event EventHandler<RangeChangedEventArgs> RangeChanged;
 
         BlobAlgorithm _blobAlgo = null;
 
@@ -54,6 +57,12 @@ namespace Project_EgennamJO.Property
 
             binRangeTrackbar.ValueLeft = 0;
             binRangeTrackbar.ValueRight = 128;
+
+            cbChannel.Items.Add("Gray");
+            cbChannel.Items.Add("Red");
+            cbChannel.Items.Add("Green");
+            cbChannel.Items.Add("Blue");
+            cbChannel.SelectedIndex = 0;
 
             cbHightlight.Items.Add("사용안함");
             cbHightlight.Items.Add("빨간색");
@@ -225,7 +234,7 @@ namespace Project_EgennamJO.Property
                 invert = true;
             }
             ShowBinaryMode showBinaryMode = (ShowBinaryMode)cbHightlight.SelectedIndex;
-            RangeChange?.Invoke(this, new RangeChangedEventArgs(leftValue, rightValue, invert, showBinaryMode));
+            RangeChanged?.Invoke(this, new RangeChangedEventArgs(leftValue, rightValue, invert, showBinaryMode));
         }
         private void Range_RangeChanged(object sender, EventArgs e)
         {
@@ -241,6 +250,11 @@ namespace Project_EgennamJO.Property
         }
         private void cbHighlight_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_blobAlgo is null)
+                return;
+
+            _blobAlgo.ImageChannel = (eImageChannel)cbChannel.SelectedIndex + 1;
+            ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
             UpdateBinary();
         }
 
@@ -289,6 +303,27 @@ namespace Project_EgennamJO.Property
             }
 
             _updateDataGridView = true;
+        }
+
+        private void cbChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (_blobAlgo is null)
+                return;
+
+            _blobAlgo.ImageChannel = (eImageChannel)cbChannel.SelectedIndex + 1;
+            ImageChannelChanged?.Invoke(this, new ImageChannelEventArgs(_blobAlgo.ImageChannel));
+        }
+    }
+    public class ImageChannelEventArgs : EventArgs
+    {
+        public eImageChannel Channel { get; }
+        public int UpperValue { get; }
+        public bool Invert { get; }
+        public ShowBinaryMode ShowBinMode { get; }
+
+        public ImageChannelEventArgs(eImageChannel channel)
+        {
+            Channel = channel;
         }
     }
 

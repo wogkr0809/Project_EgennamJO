@@ -68,13 +68,15 @@ namespace Project_EgennamJO
                     BinaryProp blobProp = new BinaryProp();
 
                     //#7_BINARY_PREVIEW#8 이진화 속성 변경시 발생하는 이벤트 추가
-                    blobProp.RangeChange += RangeSlider_RangeChanged;
-                    //blobProp.PropertyChanged += PropertyChanged;
+                    blobProp.RangeChanged += RangeSlider_RangeChanged;
+
+                    //#18_IMAGE_CHANNEL#13 이미지 채널 변경시 이벤트 추가
+                    blobProp.ImageChannelChanged += ImageChannelChanged;
                     curProp = blobProp;
                     break;
+                //#11_MATCHING#5 패턴매칭 속성창 추가
                 case InspectType.InspMatch:
                     MatchInspProp matchProp = new MatchInspProp();
-                    matchProp.PropertyChanged += PropertyChanged;
                     curProp = matchProp;
                     break;
                 case InspectType.InspFilter:
@@ -90,8 +92,8 @@ namespace Project_EgennamJO
                     return null;
             }
             return curProp;
-
         }
+
         public void ShowProperty(InspWindow window)
         {
             foreach (InspAlgorithm algo in window.AlgorithmList)
@@ -144,9 +146,9 @@ namespace Project_EgennamJO
             ShowBinaryMode showBinMode = e.ShowBinMode;
             Global.Inst.InspStage.PreView?.SetBinary(lowerValue, upperValue, invert, showBinMode);
         }
-        private void PropertyChanged(object sender, EventArgs e)
+        private void ImageChannelChanged(object sender, ImageChannelEventArgs e)
         {
-            Global.Inst.InspStage.RedrawMainView();
+            Global.Inst.InspStage.SetPreviewImage(e.Channel);
         }
 
     }

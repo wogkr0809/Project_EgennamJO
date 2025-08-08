@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Project_EgennamJO.Util;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -25,10 +26,11 @@ namespace Project_EgennamJO.Setting
         }
         private void SaveSetting()
         {
-            SettingXml.Inst.ModelDir = txtImageDir.Text;
+            SettingXml.Inst.ModelDir = txtModelDir.Text;
             SettingXml.Inst.ImageDir = txtImageDir.Text;
 
             SettingXml.Save();
+            SLogger.Write($"경로 설정 저장");
         }
 
         private void btnSelModeDir_Click(object sender, EventArgs e)
@@ -53,7 +55,7 @@ namespace Project_EgennamJO.Setting
 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    txtModelDir.Text = folderDialog.SelectedPath;
+                    txtImageDir.Text = folderDialog.SelectedPath;
                 }
             }
         }

@@ -29,6 +29,19 @@ namespace Project_EgennamJO
         DeleteList,
         UpdateImage
     }
+    public struct InspectResultCount
+    {
+        public int Total { get; set; }
+        public int OK { get; set; }
+        public int NG { get; set; }
+
+        public InspectResultCount(int _totalCount, int _okCount, int _ngCount)
+        {
+            Total = _totalCount;
+            OK = _okCount;
+            NG = _ngCount;
+        }
+    }
     public partial class ImageViewCtrl : UserControl
     {
         public event EventHandler<DiagramEntityEventArgs> DiagramEntityEvent;
@@ -43,6 +56,10 @@ namespace Project_EgennamJO
         private const float MaxZoom = 100.0f;
 
         private List<DrawInspectInfo> _rectInfos = new List<DrawInspectInfo>();
+
+        public string WorkingState { get; set; } = "";
+
+        private InspectResultCount _inspectResultCount = new InspectResultCount();
 
         private Point _roiStart = Point.Empty;
         private Rectangle _roiRect = Rectangle.Empty;
@@ -72,8 +89,10 @@ namespace Project_EgennamJO
 
         private Size _extSize = new Size(0, 0);
 
-
         private ContextMenuStrip _contextMenu;
+
+        private readonly object _lock = new object();
+
 
         public ImageViewCtrl()
         {
@@ -143,28 +162,46 @@ namespace Project_EgennamJO
         }
         public void LoadBitMap(Bitmap bitmap)
         {
+            //#15_INSP_WORKER#9 스레드에서 검사시, 멈추는 현상 방지
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new Action<Bitmap>(LoadBitMap), bitmap);
+                return;
+            }
+
+            // 기존에 로드된 이미지가 있다면 해제 후 초기화, 메모리누수 방지
             if (_bitmapImage != null)
             {
+                //이미지 크기가 같다면, 이미지 변경 후, 화면 갱신
                 if (_bitmapImage.Width == bitmap.Width && _bitmapImage.Height == bitmap.Height)
                 {
+                    _bitmapImage.Dispose();   // 기존 이미지 해제 후 교체
                     _bitmapImage = bitmap;
                     Invalidate();
                     return;
                 }
-                _bitmapImage.Dispose();
-                _bitmapImage = null;
+
+                _bitmapImage.Dispose(); // Bitmap 객체가 사용하던 메모리 리소스를 해제
+                _bitmapImage = null;  //객체를 해제하여 가비지 컬렉션(GC)이 수집할 수 있도록 설정
             }
+
+            // 새로운 이미지 로드
             _bitmapImage = bitmap;
 
+            ////bitmap==null 예외처리도 초기화되지않은 변수들 초기화
             if (_isInitialized == false)
             {
                 _isInitialized = true;
                 ResizeCanvas();
             }
+
             FitImageToScreen();
         }
         private void FitImageToScreen()
         {
+            if (_bitmapImage is null)
+                return;
+
             RecalcZoomRatio();
 
             float NewWidth = _bitmapImage.Width * _curZoom;
@@ -304,70 +341,98 @@ namespace Project_EgennamJO
                     g.DrawRectangle(pen, _selectionBox);
                 }
             }
-            // 이미지 좌표 → 화면 좌표 변환 후 사각형 그리기
-            if (_rectInfos != null)
+
+            lock (_lock)
             {
-                foreach (DrawInspectInfo rectInfo in _rectInfos)
+                DrawRectInfo(g);
+            }
+
+            if (WorkingState != "")
+            {
+                float fontSize = 20.0f;
+                Color stateColor = Color.FromArgb(255, 128, 0);
+                PointF textPos = new PointF(10, 10);
+                DrawText(g, WorkingState, textPos, fontSize, stateColor);
+            }
+            if (_inspectResultCount.Total > 0)
+            {
+                string resultText = $"Total: {_inspectResultCount.Total}\r\nOK: {_inspectResultCount.OK}\r\nNG: {_inspectResultCount.NG}";
+
+                float fontSize = 12.0f;
+                Color resultColor = Color.FromArgb(255, 255, 255);
+                PointF textPos = new PointF(Width - 80, 10);
+                DrawText(g, resultText, textPos, fontSize, resultColor);
+            }
+        }
+        private void DrawRectInfo(Graphics g)
+        {
+            if (_rectInfos == null || _rectInfos.Count <= 0)
+                return;
+
+            // 이미지 좌표 → 화면 좌표 변환 후 사각형 그리기
+            foreach (DrawInspectInfo rectInfo in _rectInfos)
+            {
+                Color lineColor = Color.LightCoral;
+                if (rectInfo.decision == DecisionType.Defect)
+                    lineColor = Color.Red;
+                else if (rectInfo.decision == DecisionType.Good)
+                    lineColor = Color.LightGreen;
+
+                Rectangle rect = new Rectangle(rectInfo.rect.X, rectInfo.rect.Y, rectInfo.rect.Width, rectInfo.rect.Height);
+                Rectangle screenRect = VirtualToScreen(rect);
+
+                using (Pen pen = new Pen(lineColor, 2))
                 {
-                    Color lineColor = Color.LightCoral;
-                    if (rectInfo.decision == DecisionType.Defect)
-                        lineColor = Color.Red;  // eyevision처럼 불량이면 빨간색
-                    else if (rectInfo.decision == DecisionType.Good)
-                        lineColor = Color.LightGreen;  //eyevision처럼 양호면 연두색.
-
-                    Rectangle rect = new Rectangle(rectInfo.rect.X, rectInfo.rect.Y, rectInfo.rect.Width, rectInfo.rect.Height);
-                    Rectangle screenRect = VirtualToScreen(rect);
-
-                    using (Pen pen = new Pen(lineColor, 2))
+                    if (rectInfo.UseRotatedRect)
                     {
-                        if (rectInfo.UseRotatedRect)
-                        {
-                            PointF[] screenPoints = rectInfo.rotatedPoints
-                                                    .Select(p => VirtualToScreen(new PointF(p.X, p.Y))) // 화면 좌표계로 변환
-                                                    .ToArray();
+                        PointF[] screenPoints = rectInfo.rotatedPoints
+                                                .Select(p => VirtualToScreen(new PointF(p.X, p.Y))) // 화면 좌표계로 변환
+                                                .ToArray();
 
-                            if (screenPoints.Length == 4)
+                        if (screenPoints.Length == 4)
+                        {
+                            for (int i = 0; i < 4; i++)
                             {
-                                for (int i = 0; i < 4; i++)
-                                {
-                                    g.DrawLine(pen, screenPoints[i], screenPoints[(i + 1) % 4]);
-                                    // 시계방향으로 선 연결,  %4 연산은 나머지값. 01,12,23,34 인데 4의 나머지가 0이므로 연결된다.
-                                }
+                                g.DrawLine(pen, screenPoints[i], screenPoints[(i + 1) % 4]); // 시계방향으로 선 연결
                             }
                         }
-                        else
-                        {
-                            g.DrawRectangle(pen, screenRect);
-                        }
                     }
-
-                    if (rectInfo.info != "")
+                    else
                     {
-                        float baseFontSize = 20.0f;
-
-                        if (rectInfo.decision == DecisionType.Info)
-                        {
-                            baseFontSize = 3.0f;
-                            lineColor = Color.LightBlue;
-                        }
-
-                        float fontSize = baseFontSize * _curZoom;
-
-                        // 스코어 문자열 그리기 (우상단)
-                        string infoText = rectInfo.info;
-                        PointF textPos = new PointF(screenRect.Left, screenRect.Top); // 위로 약간 띄우기
-
-                        if (rectInfo.inspectType == InspectType.InspBinary
-                            && rectInfo.decision != DecisionType.Info)
-                        {
-                            textPos.Y = screenRect.Bottom - fontSize;
-                        }
-
-                        DrawText(g, infoText, textPos, fontSize, lineColor);
+                        g.DrawRectangle(pen, screenRect);
                     }
+                }
+
+                if (rectInfo.info != "")
+                {
+                    float baseFontSize = 20.0f;
+
+                    if (rectInfo.decision == DecisionType.Info)
+                    {
+                        baseFontSize = 3.0f;
+                        lineColor = Color.LightBlue;
+                    }
+
+                    float fontSize = baseFontSize * _curZoom;
+
+                    // 스코어 문자열 그리기 (우상단)
+                    string infoText = rectInfo.info;
+                    PointF textPos = new PointF(screenRect.Left, screenRect.Top); // 위로 약간 띄우기
+
+                    if (rectInfo.inspectType == InspectType.InspBinary
+                        && rectInfo.decision != DecisionType.Info)
+                    {
+                        textPos.Y = screenRect.Bottom - fontSize;
+                    }
+
+                    DrawText(g, infoText, textPos, fontSize, lineColor);
                 }
             }
         }
+
+
+
+        // 이미지 좌표 → 화면 좌표 변환 후 사각형 그리기
         private void DrawText(Graphics g, string text, PointF position, float fontSize, Color color)
         {
             using (Font font = new Font("Arial", fontSize, FontStyle.Bold))
@@ -890,9 +955,93 @@ namespace Project_EgennamJO
             _rectInfos.AddRange(rectInfos);
             Invalidate();
         }
+        public void SetInspResultCount(InspectResultCount inspectResultCount)
+        {
+            _inspectResultCount = inspectResultCount;
+        }
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            _isCtrlPressed = keyData == Keys.Control;
+
+            if (keyData == (Keys.Control | Keys.C))
+            {
+                CopySelectedROIs();
+            }
+            else if (keyData == (Keys.Control | Keys.V))
+            {
+                PasteROIsAt();
+            }
+            else
+            {
+                switch (keyData)
+                {
+                    case Keys.Delete:
+                        {
+                            if (_selEntity != null)
+                            {
+                                DeleteSelEntity();
+                            }
+                        }
+                        break;
+                    case Keys.Enter:
+                        {
+                            InspWindow selWindow = null;
+                            if (_selEntity != null)
+                                selWindow = _selEntity.LinkedWindow;
+
+                            DiagramEntityEvent?.Invoke(this, new DiagramEntityEventArgs(EntityActionType.Inspect, selWindow));
+                        }
+                        break;
+                }
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+        // ─── 복사(Ctrl+C) ----------------------------------------------------------
+        private void CopySelectedROIs() // #ROI COPYPASTE#
+        {
+            _copyBuffer.Clear();
+            for (int i = 0; i < _multiSelectedEntities.Count; i++)
+            {
+                _copyBuffer.Add(_multiSelectedEntities[i]);
+            }
+        }
+        // ─── 붙여넣기(Ctrl+V) ------------------------------------------------------
+        private void PasteROIsAt() // #ROI COPYPASTE#
+        {
+            if (_copyBuffer.Count == 0)
+                return;
+
+            // ① 기준점(마우스)을 Virtual 좌표로 변환
+            PointF virtBase = ScreenToVirtual(_mousePos);
+
+            foreach (var entity in _copyBuffer)
+            {
+                int dx = (int)(virtBase.X - entity.EntityROI.Left + 0.5f);
+                int dy = (int)(virtBase.Y - entity.EntityROI.Top + 0.5f);
+                var newRect = entity.EntityROI;
+
+                DiagramEntityEvent?.Invoke(this,
+                    new DiagramEntityEventArgs(EntityActionType.Copy, entity.LinkedWindow,
+                                                entity.LinkedWindow?.InspWindowType ?? InspWindowType.None,
+                                                newRect, new Point(dx, dy)));
+            }
+            Invalidate();
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Control)
+                _isCtrlPressed = false;
+
+            base.OnKeyUp(e);
+        }
         public void ResetEntity()
         {
-            _rectInfos.Clear();
+            lock (_lock)
+            {
+                _rectInfos.Clear();
+            }
             Invalidate();
         }
         public bool SetDiagramEntityList(List<DiagramEntity> diagramEntityList)

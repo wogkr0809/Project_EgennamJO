@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using OpenCvSharp;
 using Project_EgennamJO.Core;
+using Project_EgennamJO.Util;
 
 namespace Project_EgennamJO.Alogrithm
 {
     public class MatchAlgorithm : InspAlgorithm
     {
+        [XmlIgnore]
         private List<Mat> _templateImages = new List<Mat>();
 
         public int MatchScore { get; set; } = 60;
@@ -92,7 +95,7 @@ namespace Project_EgennamJO.Alogrithm
             OutScore = (int)(maxScore * 100);
             OutPoint = maxLoc + leftTopPos;
 
-            Console.Write($"최적 매칭 위치: {maxLoc}, 신뢰도: {maxScore:F2}");
+            SLogger.Write($"최적 매칭 위치: {maxLoc}, 신뢰도: {maxScore:F2}");
 
             return true;
         }
@@ -318,7 +321,7 @@ namespace Project_EgennamJO.Alogrithm
 
             foreach (var point in OutPoints)
             {
-                Console.Write($"매칭된 위치: {OutPoints}");
+                SLogger.Write($"매칭된 위치: {OutPoints}");
                 resultArea.Add(new DrawInspectInfo(new Rect(point.X, point.Y, _templateImages[0].Width, _templateImages[0].Height),
                     info, InspectType.InspMatch, decisionType));
             }

@@ -81,12 +81,14 @@ namespace Project_EgennamJO.Setting
 
         public SettingXml() { }
 
-        public string MachineName { get; set; } = "Jidam";
+        public string MachineName { get; set; } = "Project EgnnamJo";
 
         public string ModelDir { get; set; } = "";
         public string ImageDir { get; set; } = "";
 
         public CameraType CamType { get; set; } = CameraType.WebCam;
+
+        public bool CycleMode { get; set; } = false;
 
     }
 }

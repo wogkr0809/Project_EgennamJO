@@ -1,5 +1,6 @@
 ﻿using Project_EgennamJO.Core;
 using Project_EgennamJO.Grab;
+using Project_EgennamJO.Setting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,36 +24,46 @@ namespace Project_EgennamJO
         }
         private void btnGrab_Click(object sender, EventArgs e)
         {
-            var stage = Global.Inst.InspStage;
-
-            Console.WriteLine($"[RunForm] 촬상 클릭됨. CameraType: {stage.GetCurrentCameraType()}");
-
-            if (stage.GetCurrentCameraType() == CameraType.None)
-            {
-                MessageBox.Show("현재 선택된 카메라가 없습니다.");
-                return;
-            }
-
-            stage.Grab(0);
+            Global.Inst.InspStage.CheckImageBuffer();
+            Global.Inst.InspStage.Grab(0);
         }
 
         private void btnLive_Click(object sender, EventArgs e)
         {
-            Global.Inst.InspStage.ToggleLiveMode();
+            Global.Inst.InspStage.LiveMode = !Global.Inst.InspStage.LiveMode;
+
             if (Global.Inst.InspStage.LiveMode)
             {
-                btnLive.Text = "Live stop";
+                Global.Inst.InspStage.SetWorkingState(WorkingState.LIVE);
+                //#13_SET_IMAGE_BUFFER#4 그랩시 이미지 버퍼를 먼저 설정하도록 변경
+                Global.Inst.InspStage.CheckImageBuffer();
                 Global.Inst.InspStage.Grab(0);
             }
             else
             {
-                btnLive.Text = "Live start";
+                Global.Inst.InspStage.SetWorkingState(WorkingState.NONE);
             }
         }
         private void btnStart_Click(object sender, EventArgs e)
         {
 
-            Global.Inst.InspStage.TryInspection();
+            string serialID = $"{DateTime.Now:MM-dd HH:mm:ss}";
+            Global.Inst.InspStage.InspectReady("LOT_NUMBER", serialID);
+
+            if (SettingXml.Inst.CamType == Grab.CameraType.None)
+            {
+                bool cycleMode = SettingXml.Inst.CycleMode;
+                Global.Inst.InspStage.CycleInspect(cycleMode);
+            }
+            else
+            {
+                Global.Inst.InspStage.StartAutoRun();
+            }
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            Global.Inst.InspStage.StopCycle();
         }
     }
 }

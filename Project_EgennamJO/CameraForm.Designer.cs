@@ -30,31 +30,44 @@ namespace Project_EgennamJO
         /// </summary>
         private void InitializeComponent()
         {     
-            this.imageViewCtrl = new Project_EgennamJO.ImageViewCtrl();
+            this.mainViewToolbar = new Project_EgennamJO.UIControl.MainViewToolbar();
+            this.imageViewer = new Project_EgennamJO.ImageViewCtrl();
             this.SuspendLayout();
             // 
-            // imageViewCtrl
+            // mainViewToolbar
             // 
-            this.imageViewCtrl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageViewCtrl.Location = new System.Drawing.Point(0, 0);
-            this.imageViewCtrl.Name = "imageViewCtrl";
-            this.imageViewCtrl.Size = new System.Drawing.Size(1040, 617);
-            this.imageViewCtrl.TabIndex = 0;
+            this.mainViewToolbar.Dock = System.Windows.Forms.DockStyle.Right;
+            this.mainViewToolbar.Location = new System.Drawing.Point(910, 0);
+            this.mainViewToolbar.Name = "mainViewToolbar";
+            this.mainViewToolbar.Size = new System.Drawing.Size(130, 617);
+            this.mainViewToolbar.TabIndex = 1;
+            // 
+            // imageViewer
+            // 
+            this.imageViewer.Dock = System.Windows.Forms.DockStyle.Left;
+            this.imageViewer.Location = new System.Drawing.Point(0, 0);
+            this.imageViewer.Name = "imageViewer";
+            this.imageViewer.Size = new System.Drawing.Size(1040, 617);
+            this.imageViewer.TabIndex = 0;
+            this.imageViewer.WorkingState = "";
             // 
             // CameraForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1040, 617);
-            this.Controls.Add(this.imageViewCtrl);
+            this.Controls.Add(this.mainViewToolbar);
+            this.Controls.Add(this.imageViewer);
             this.Name = "CameraForm";
             this.Text = "CameraForm";
+            this.Resize += new System.EventHandler(this.CameraForm_Resize);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private ImageViewCtrl imageViewCtrl;
+        private ImageViewCtrl imageViewer;
+        private UIControl.MainViewToolbar mainViewToolbar;
     }
 }

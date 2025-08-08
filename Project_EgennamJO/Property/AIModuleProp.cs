@@ -47,7 +47,7 @@ namespace Project_EgennamJO
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     _modelPath = openFileDialog.FileName;
-                    textBox1.Text = _modelPath;
+                    txtAIModelPath.Text = _modelPath;
                 }
             }
         }

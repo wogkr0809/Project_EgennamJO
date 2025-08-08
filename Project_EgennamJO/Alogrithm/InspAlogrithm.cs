@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using OpenCvSharp;
 using Project_EgennamJO.Core;
 
@@ -17,6 +18,9 @@ namespace Project_EgennamJO.Alogrithm
         InspAIModule,
         InspCount
     }
+
+    [XmlInclude(typeof(MatchAlgorithm))]
+    [XmlInclude(typeof(BlobAlgorithm))]
     public abstract class InspAlgorithm
     {
         public InspectType InspectType { get; set; } = InspectType.InspNone;

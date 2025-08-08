@@ -1,6 +1,8 @@
-﻿using Project_EgennamJO.Core;
+﻿using Common.Util.Helpers;
+using Project_EgennamJO.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,6 +65,41 @@ namespace Project_EgennamJO.Teach
             ModelPath = path;
             ModelName = modelName;
             ModelInfo = modelInfo;
+        }
+        public Model Load(string path)
+        {
+            Model model = XmlHelper.LoadXml<Model>(path);
+            if (model == null)
+                return null;
+
+            foreach (var window in model.InspWindowList)
+            {
+                window.LoadInspWindow(model);
+            }
+
+            return model;
+        }
+        public void Save()
+        {
+            if (ModelPath == "")
+                return;
+
+            XmlHelper.SaveXml(ModelPath, this);
+
+            foreach (var window in InspWindowList)
+            {
+                window.SaveInspWindow(this);
+            }
+        }
+        public void SaveAs(string filePath)
+        {
+            string fileName = Path.GetFileName(filePath);
+            if (Directory.Exists(filePath) == false)
+            {
+                ModelPath = Path.Combine(filePath, fileName + ".xml");
+                ModelName = fileName;
+                Save();
+            }
         }
     }
 }

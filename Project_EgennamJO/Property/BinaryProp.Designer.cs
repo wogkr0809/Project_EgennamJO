@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.grpBinary = new System.Windows.Forms.GroupBox();
+            this.cbChannel = new System.Windows.Forms.ComboBox();
+            this.lbChannel = new System.Windows.Forms.Label();
+            this.binRangeTrackbar = new Project_EgennamJO.UIControl.RangeTrackbar();
             this.cbHightlight = new System.Windows.Forms.ComboBox();
             this.lbHighlight = new System.Windows.Forms.Label();
             this.chkUse = new System.Windows.Forms.CheckBox();
@@ -36,27 +39,56 @@
             this.cbBinMethod = new System.Windows.Forms.ComboBox();
             this.dataGridViewFilter = new System.Windows.Forms.DataGridView();
             this.chkRotatedRect = new System.Windows.Forms.CheckBox();
-            this.binRangeTrackbar = new Project_EgennamJO.UIControl.RangeTrackbar();
             this.grpBinary.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewFilter)).BeginInit();
             this.SuspendLayout();
             // 
             // grpBinary
             // 
+            this.grpBinary.Controls.Add(this.cbChannel);
+            this.grpBinary.Controls.Add(this.lbChannel);
             this.grpBinary.Controls.Add(this.binRangeTrackbar);
             this.grpBinary.Controls.Add(this.cbHightlight);
             this.grpBinary.Controls.Add(this.lbHighlight);
             this.grpBinary.Location = new System.Drawing.Point(21, 60);
             this.grpBinary.Name = "grpBinary";
-            this.grpBinary.Size = new System.Drawing.Size(379, 142);
+            this.grpBinary.Size = new System.Drawing.Size(379, 161);
             this.grpBinary.TabIndex = 0;
             this.grpBinary.TabStop = false;
             this.grpBinary.Text = "이진화";
             // 
+            // cbChannel
+            // 
+            this.cbChannel.FormattingEnabled = true;
+            this.cbChannel.Location = new System.Drawing.Point(135, 87);
+            this.cbChannel.Name = "cbChannel";
+            this.cbChannel.Size = new System.Drawing.Size(211, 26);
+            this.cbChannel.TabIndex = 4;
+            this.cbChannel.SelectedIndexChanged += new System.EventHandler(this.cbChannel_SelectedIndexChanged);
+            // 
+            // lbChannel
+            // 
+            this.lbChannel.AutoSize = true;
+            this.lbChannel.Location = new System.Drawing.Point(20, 90);
+            this.lbChannel.Name = "lbChannel";
+            this.lbChannel.Size = new System.Drawing.Size(104, 18);
+            this.lbChannel.TabIndex = 3;
+            this.lbChannel.Text = "이미지 채널";
+            // 
+            // binRangeTrackbar
+            // 
+            this.binRangeTrackbar.Location = new System.Drawing.Point(19, 27);
+            this.binRangeTrackbar.Name = "binRangeTrackbar";
+            this.binRangeTrackbar.Size = new System.Drawing.Size(339, 54);
+            this.binRangeTrackbar.TabIndex = 2;
+            this.binRangeTrackbar.ValueLeft = 80;
+            this.binRangeTrackbar.ValueRight = 200;
+            this.binRangeTrackbar.RangeChanged += new System.EventHandler(this.Range_RangeChanged);
+            // 
             // cbHightlight
             // 
             this.cbHightlight.FormattingEnabled = true;
-            this.cbHightlight.Location = new System.Drawing.Point(135, 107);
+            this.cbHightlight.Location = new System.Drawing.Point(135, 129);
             this.cbHightlight.Name = "cbHightlight";
             this.cbHightlight.Size = new System.Drawing.Size(211, 26);
             this.cbHightlight.TabIndex = 1;
@@ -65,7 +97,7 @@
             // lbHighlight
             // 
             this.lbHighlight.AutoSize = true;
-            this.lbHighlight.Location = new System.Drawing.Point(16, 110);
+            this.lbHighlight.Location = new System.Drawing.Point(16, 129);
             this.lbHighlight.Name = "lbHighlight";
             this.lbHighlight.Size = new System.Drawing.Size(98, 18);
             this.lbHighlight.TabIndex = 0;
@@ -96,7 +128,7 @@
             // cbBinMethod
             // 
             this.cbBinMethod.FormattingEnabled = true;
-            this.cbBinMethod.Location = new System.Drawing.Point(164, 227);
+            this.cbBinMethod.Location = new System.Drawing.Point(156, 227);
             this.cbBinMethod.Name = "cbBinMethod";
             this.cbBinMethod.Size = new System.Drawing.Size(211, 26);
             this.cbBinMethod.TabIndex = 3;
@@ -126,16 +158,6 @@
             this.chkRotatedRect.Text = "회전사각형";
             this.chkRotatedRect.UseVisualStyleBackColor = true;
             this.chkRotatedRect.CheckedChanged += new System.EventHandler(this.chkRotatedRect_CheckedChanged);
-            // 
-            // binRangeTrackbar
-            // 
-            this.binRangeTrackbar.Location = new System.Drawing.Point(19, 27);
-            this.binRangeTrackbar.Name = "binRangeTrackbar";
-            this.binRangeTrackbar.Size = new System.Drawing.Size(339, 54);
-            this.binRangeTrackbar.TabIndex = 2;
-            this.binRangeTrackbar.ValueLeft = 80;
-            this.binRangeTrackbar.ValueRight = 200;
-            this.binRangeTrackbar.RangeChanged += new System.EventHandler(this.Range_RangeChanged);
             // 
             // BinaryProp
             // 
@@ -168,5 +190,7 @@
         private System.Windows.Forms.ComboBox cbBinMethod;
         private System.Windows.Forms.DataGridView dataGridViewFilter;
         private System.Windows.Forms.CheckBox chkRotatedRect;
+        private System.Windows.Forms.ComboBox cbChannel;
+        private System.Windows.Forms.Label lbChannel;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Project_EgennamJO.Core;
 using Project_EgennamJO.Grab;
+using Project_EgennamJO.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,10 +35,7 @@ namespace Project_EgennamJO.Setting
             SettingXml.Inst.CamType = selectedType;
             SettingXml.Save();
 
-            // 새로 추가된 부분!
-            Global.Inst.InspStage.SetCameraType(selectedType);
-
-            Console.WriteLine($"[CameraSetting] 카메라 타입 변경됨: {selectedType}");
+            SLogger.Write($"카메라 설정 저장");
         }
 
         private void btnApply_Click(object sender, EventArgs e)

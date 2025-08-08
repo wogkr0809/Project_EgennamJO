@@ -10,16 +10,23 @@ using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using Project_EgennamJO.Teach;
 using Project_EgennamJO.Setting;
+using System.IO;
+using System.Runtime.InteropServices;
+using Project_EgennamJO.Inspect;
+using System.Windows.Forms;
+using Project_EgennamJO.Util;
+using Microsoft.Win32;
 
 namespace Project_EgennamJO.Core
 {
     public class InspStage : IDisposable
     {
-        public static readonly int MAX_GRAB_BUF = 5;
+        public static readonly int MAX_GRAB_BUF = 1;
 
         private ImageSpace _imageSpace = null;
 
         private GrabModel _grabManager = null;
+
         private CameraType _camType = CameraType.WebCam;
 
         SAIGEAI _saigeAI;
@@ -32,21 +39,20 @@ namespace Project_EgennamJO.Core
 
         private InspWindow _selectedInspWindow = null;
 
+        private InspWorker _inspWorker = null;
+        private ImageLoader _imageLoader = null;
+
+        RegistryKey _regKey = null;
+
+        private bool _lastestModelOpen = false;
+
         public bool LiveMode { get; set; } = false;
 
-        public void ToggleLiveMode()
-        {
-            LiveMode = !LiveMode;
+        public bool UseCamera { get; set; } = false;
 
-        }
-
-        public static class SLogger
-        {
-            public static void Write(string msg)
-            {
-                Console.WriteLine(msg);
-            }
-        }
+        private string _lotNumber;
+        private string _serialID;
+        
         public InspStage() { }
 
         public ImageSpace ImageSpace
@@ -67,52 +73,32 @@ namespace Project_EgennamJO.Core
         {
             get => _previewImage;
         }
+        public InspWorker InspWorker
+        {
+            get => _inspWorker;
+        }
 
         public Model CurModel
         {
             get => _model;
         }
-        public CameraType GetCurrentCameraType()
-        {
-            return _camType;
-        }
 
-        public void SetCameraType(CameraType camType)
-        {
-            if (_camType == camType)
-                return;
+        public int SelBufferIndex { get; set; } = 0;
 
-            _camType = camType;
+        public eImageChannel SelImageChannel { get; set; } = eImageChannel.Gray;
 
-            _grabManager?.Dispose();
-            _grabManager = null;
-
-            switch (_camType)
-            {
-                case CameraType.WebCam:
-                    _grabManager = new WebCam();
-                    break;
-                case CameraType.HikRobotCam:
-                    _grabManager = new HikRobotCam();
-                    break;
-                case CameraType.None:
-                    return;
-            }
-
-            if (_grabManager.InitGrab())
-            {
-                _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
-                InitModerGrab(MAX_GRAB_BUF);
-            }
-        }
         public bool Initialize()
         {
+            SLogger.Write("InspStage 초기화!");
             _imageSpace = new ImageSpace();
             _previewImage = new PreviewImage();
 
-            _model = new Model();
+            _inspWorker = new InspWorker();
+            _imageLoader = new ImageLoader();
 
-            LoadSetting();
+            _regKey = Registry.CurrentUser.CreateSubKey("Software\\MoldVisionJ");
+
+            _model = new Model();
 
             switch (_camType)
             {
@@ -129,19 +115,20 @@ namespace Project_EgennamJO.Core
             }
             if (_grabManager != null && _grabManager.InitGrab() == true)
             {
-                _grabManager.TransferCompleted -= _multiGrab_TransferCompleted;
                 _grabManager.TransferCompleted += _multiGrab_TransferCompleted;
-                InitModerGrab(MAX_GRAB_BUF);
-                return true;
+
+                InitModelGrab(MAX_GRAB_BUF);
             }
-            return false;
+
+            if (!LastestModelOpen())
+            {
+                MessageBox.Show("모델 열기 실패!");
+            }
+
+            return true;
         }
-        private void LoadSetting()
-        {
-            //카메라 설정 타입 얻기
-            _camType = SettingXml.Inst.CamType;
-        }
-        public void InitModerGrab(int bufferCount)
+       
+        public void InitModelGrab(int bufferCount)
         {
             if (_grabManager == null)
                 return;
@@ -161,7 +148,77 @@ namespace Project_EgennamJO.Core
             }
             SetBuffer(bufferCount);
 
+            eImageChannel imageChannel = (pixelBpp == 24) ? eImageChannel.Color : eImageChannel.Gray;
+            SetImageChannel(imageChannel);
         }
+        public void SetImageBuffer(string filePath)
+        {
+            SLogger.Write($"Load Image : {filePath}");
+
+            Mat matImage = Cv2.ImRead(filePath);
+
+            int pixelBpp = 8;
+            int imageWidth;
+            int imageHeight;
+            int imageStride;
+
+            if (matImage.Type() == MatType.CV_8UC3)
+                pixelBpp = 24;
+
+            imageWidth = (matImage.Width + 3) / 4 * 4;
+            imageHeight = matImage.Height;
+
+            // 4바이트 정렬된 새로운 Mat 생성
+            Mat alignedMat = new Mat();
+            Cv2.CopyMakeBorder(matImage, alignedMat, 0, 0, 0, imageWidth - matImage.Width, BorderTypes.Constant, Scalar.Black);
+
+            imageStride = imageWidth * matImage.ElemSize();
+
+            if (_imageSpace != null)
+            {
+                _imageSpace.SetImageInfo(pixelBpp, imageWidth, imageHeight, imageStride);
+            }
+
+            SetBuffer(1);
+
+            int bufferIndex = 0;
+
+            // Mat의 데이터를 byte 배열로 복사
+            int bufSize = (int)(alignedMat.Total() * alignedMat.ElemSize());
+            Marshal.Copy(alignedMat.Data, ImageSpace.GetInspectionBuffer(bufferIndex), 0, bufSize);
+
+            _imageSpace.Split(bufferIndex);
+
+            DisplayGrabImage(bufferIndex);
+
+            if (_previewImage != null)
+            {
+                Bitmap bitmap = ImageSpace.GetBitmap(0);
+                _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
+            }
+        }
+        public void CheckImageBuffer()
+        {
+            if (_grabManager != null && SettingXml.Inst.CamType != CameraType.None)
+            {
+                int imageWidth;
+                int imageHeight;
+                int imageStride;
+                _grabManager.GetResolution(out imageWidth, out imageHeight, out imageStride);
+
+                if (_imageSpace.ImageSize.Width != imageWidth || _imageSpace.ImageSize.Height != imageHeight)
+                {
+                    int pixelBpp = 8;
+                    _grabManager.GetPixelBpp(out pixelBpp);
+
+                    _imageSpace.SetImageInfo(pixelBpp, imageWidth, imageHeight, imageStride);
+                    SetBuffer(_imageSpace.BufferCount);
+                }
+            }
+        }
+
+
+
         private void UpdateProperty(InspWindow inspWindow)
         {
             if (inspWindow is null)
@@ -209,7 +266,7 @@ namespace Project_EgennamJO.Core
             if (inspWindow.WindowArea.Right >= curImage.Width ||
                 inspWindow.WindowArea.Bottom >= curImage.Height)
             {
-                Console.Write("Roi 영역이 잘못되었습니다!");
+               SLogger.Write("Roi 영역이 잘못되었습니다!");
                 return;
             }
             Mat windowImage = curImage[inspWindow.WindowArea];
@@ -224,88 +281,36 @@ namespace Project_EgennamJO.Core
             MatchAlgorithm matchAlgo = (MatchAlgorithm)inspWindow.FindInspAlgorithm(InspectType.InspMatch);
             if(matchAlgo != null)
             {
+                matchAlgo.ImageChannel = SelImageChannel;
+                if (matchAlgo.ImageChannel == eImageChannel.Color)
+                    matchAlgo.ImageChannel = eImageChannel.Gray;
                 UpdateProperty(inspWindow);
             }    
         }
 
         public void SetBuffer(int bufferCount)
         {
-            if (_grabManager == null)
-                return;
-            if (_imageSpace.BufferCount == bufferCount)
-                return;
             _imageSpace.InitImageSpace(bufferCount);
-            _grabManager.InitBuffer(bufferCount);
 
-            for (int i = 0; i < bufferCount; i++)
+            if (_grabManager != null)
             {
-                _grabManager.SetBuffer(
-                    _imageSpace.GetInspectionBuffer(i),
-                    _imageSpace.GetInspectionBufferPtr(i),
-                    _imageSpace.GetInspectionBufferHandle(i), i);
+                _grabManager.InitBuffer(bufferCount);
+
+                for (int i = 0; i < bufferCount; i++)
+                {
+                    _grabManager.SetBuffer(
+                        _imageSpace.GetInspectionBuffer(i),
+                        _imageSpace.GetInspectionBufferPtr(i),
+                        _imageSpace.GetInspectionBufferHandle(i),
+                        i);
+                }
             }
+            SLogger.Write("버퍼 초기화 성공!");
         }
-        public void TryInspection(InspWindow inspWindow = null)
+        public void TryInspection(InspWindow inspWindow)
         {
-            if (inspWindow is null)
-            {
-                if (_selectedInspWindow is null)
-                    return;
-                inspWindow = _selectedInspWindow;
-            }
             UpdateDiagramEntity();
-
-            List<DrawInspectInfo> totalArea = new List<DrawInspectInfo>();
-
-            Rect windowArea = inspWindow.WindowArea;
-
-            foreach (var inspAlgo in inspWindow.AlgorithmList)
-            {
-                inspAlgo.TeachRect = windowArea;
-                inspAlgo.InspRect = windowArea;
-
-                InspectType inspType = inspAlgo.InspectType;
-
-                switch (inspType)
-                {
-                    case InspectType.InspBinary:
-                        {
-                            BlobAlgorithm blobAlgo = (BlobAlgorithm)inspAlgo;
-
-                            Mat srcImage = Global.Inst.InspStage.GetMat();
-                            blobAlgo.SetInspData(srcImage);
-
-                            if (blobAlgo.DoInspect())
-                            {
-                                List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
-                                int resultCnt = blobAlgo.GetResultRect(out resultArea);
-                                if (resultCnt > 0)
-                                {
-                                    totalArea.AddRange(resultArea);
-                                }
-                            }
-                            break;
-                        }
-                }
-                if (inspAlgo.DoInspect())
-                {
-                    List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
-                    int resultCnt = inspAlgo.GetResultRect(out resultArea);
-                    if (resultCnt > 0)
-                    {
-                        totalArea.AddRange(resultArea);
-                    }
-                }
-            }
-            if (totalArea.Count > 0)
-            {
-                //찾은 위치를 이미지상에서 표시
-                var cameraForm = MainForm.GetDockForm<CameraForm>();
-                if (cameraForm != null)
-                {
-                    cameraForm.AddRect(totalArea);
-                }
-            }
+            InspWorker.TryInspect(inspWindow, InspectType.InspNone);
         }
         public void SelectInspWindow(InspWindow inspWindow)
         {
@@ -395,38 +400,21 @@ namespace Project_EgennamJO.Core
             UpdateDiagramEntity();
         }
 
-        private bool DisplayResult()
-        {
-            if (_blobAlgorithm is null)
-                return false;
-
-            List<DrawInspectInfo> resultArea = new List<DrawInspectInfo>();
-            int resultCnt = _blobAlgorithm.GetResultRect(out resultArea);
-            if (resultCnt > 0)
-            {
-                //찾은 위치를 이미지상에서 표시
-                var cameraForm = MainForm.GetDockForm<CameraForm>();
-                if (cameraForm != null)
-                {
-                    cameraForm.ResetDisplay();
-                    cameraForm.AddRect(resultArea);
-                }
-            }
-
-            return true;
-        }
-        public void Grab(int bufferIndex)
+     
+        public bool Grab(int bufferIndex)
         {
             if (_grabManager == null)
-                return;
+                return false;
+            if (!_grabManager.Grab(bufferIndex, true))
+                return false;
 
-            _grabManager.Grab(bufferIndex, true);
+            return true;
         }
 
         private async void _multiGrab_TransferCompleted(object sender, object e)
         {
             int bufferIndex = (int)e;
-            Console.WriteLine($"_multiGrab_TransferCompleted {bufferIndex}");
+            SLogger.Write($"TransferCompleted {bufferIndex}");
             _imageSpace.Split(bufferIndex);
             DisplayGrabImage(bufferIndex);
             if (_previewImage != null)
@@ -450,6 +438,24 @@ namespace Project_EgennamJO.Core
                 cameraForm.UpdateDisplay();
             }
         }
+        public void SetPreviewImage(eImageChannel channel)
+        {
+            if (_previewImage is null)
+                return;
+
+            Bitmap bitmap = ImageSpace.GetBitmap(0, channel);
+            _previewImage.SetImage(BitmapConverter.ToMat(bitmap));
+
+            SetImageChannel(channel);
+        }
+        public void SetImageChannel(eImageChannel channel)
+        {
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                cameraForm.SetImageChannel(channel);
+            }
+        }
         public void UpdateDisplay(Bitmap bitmap)
         {
 
@@ -460,16 +466,26 @@ namespace Project_EgennamJO.Core
             }
         }
         
-        public Bitmap GetBitmap(int bufferIndex = -1)
+        public Bitmap GetBitmap(int bufferIndex = -1, eImageChannel imageChannel = eImageChannel.None)
         {
+            if (bufferIndex >= 0)
+                SelBufferIndex = bufferIndex;
+
+            //#BINARY FILTER#13 채널 정보가 유지되도록, eImageChannel.None 타입을 추가
+            if (imageChannel != eImageChannel.None)
+                SelImageChannel = imageChannel;
+
             if (Global.Inst.InspStage.ImageSpace is null)
                 return null;
 
-            return Global.Inst.InspStage.ImageSpace.GetBitmap();
+            return Global.Inst.InspStage.ImageSpace.GetBitmap(SelBufferIndex, SelImageChannel);
         }
         public Mat GetMat(int bufferIndex = -1, eImageChannel imageChannel = eImageChannel.None)
         {
-            return Global.Inst.InspStage.ImageSpace.GetMat();
+            if (bufferIndex >= 0)
+                SelBufferIndex = bufferIndex;
+
+            return Global.Inst.InspStage.ImageSpace.GetMat(SelBufferIndex, imageChannel);
         }
         public void UpdateDiagramEntity()
         {
@@ -493,6 +509,178 @@ namespace Project_EgennamJO.Core
                 cameraForm.UpdateImageViewer();
             }
         }
+        public void ResetDisplay()
+        {
+            CameraForm cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                cameraForm.ResetDisplay();
+            }
+        }
+
+        public bool LoadModel(string filePath)
+        {
+            SLogger.Write($"모델 로딩:{filePath}");
+
+            _model = _model.Load(filePath);
+
+            if (_model is null)
+            {
+                SLogger.Write($"모델 로딩 실패:{filePath}");
+                return false;
+            }
+
+            string inspImagePath = _model.InspectImagePath;
+
+            if (File.Exists(inspImagePath))
+            {
+                Global.Inst.InspStage.SetImageBuffer(inspImagePath);
+            }
+
+            UpdateDiagramEntity();
+
+            return true;
+        }
+        public void SaveModel(string filePath)
+        {
+            SLogger.Write($"모델 저장:{filePath}");
+
+            //입력 경로가 없으면 현재 모델 저장
+            if (string.IsNullOrEmpty(filePath))
+                Global.Inst.InspStage.CurModel.Save();
+            else
+                Global.Inst.InspStage.CurModel.SaveAs(filePath);
+        }
+        private bool LastestModelOpen()
+        {
+            if (_lastestModelOpen)
+                return true;
+
+            _lastestModelOpen = true;
+
+            string lastestModel = (string)_regKey.GetValue("LastestModelPath");
+            if (File.Exists(lastestModel) == false)
+                return true;
+
+            DialogResult result = MessageBox.Show($"최근 모델을 로딩할까요?\r\n{lastestModel}", "Question", MessageBoxButtons.YesNo);
+            if (result == DialogResult.No)
+                return true;
+
+            return LoadModel(lastestModel);
+        }
+        public void CycleInspect(bool isCycle)
+        {
+            if (InspWorker.IsRunning)
+                return;
+
+            if (!UseCamera)
+            {
+                string inspImagePath = CurModel.InspectImagePath;
+                if (inspImagePath == "")
+                    return;
+
+                string inspImageDir = Path.GetDirectoryName(inspImagePath);
+                if (!Directory.Exists(inspImageDir))
+                    return;
+
+                if (!_imageLoader.IsLoadedImages())
+                    _imageLoader.LoadImages(inspImageDir);
+            }
+
+            if (isCycle)
+                _inspWorker.StartCycleInspectImage();
+            else
+                OneCycle();
+        }
+        public bool OneCycle()
+        {
+            if (UseCamera)
+            {
+                if (!Grab(0))
+                    return false;
+            }
+            else
+            {
+                if (!VirtualGrab())
+                    return false;
+            }
+
+              ResetDisplay();
+
+            bool isDefect;
+            if (!_inspWorker.RunInspect(out isDefect))
+                return false;
+
+            return true;
+        }
+        public void StopCycle()
+        {
+            if (_inspWorker != null)
+                _inspWorker.Stop();
+
+            SetWorkingState(WorkingState.NONE);
+        }
+        public bool VirtualGrab()
+        {
+            if (_imageLoader is null)
+                return false;
+
+            string imagePath = _imageLoader.GetNextImagePath();
+            if (imagePath == "")
+                return false;
+
+            Global.Inst.InspStage.SetImageBuffer(imagePath);
+
+            _imageSpace.Split(0);
+
+            DisplayGrabImage(0);
+
+            return true;
+        }
+        public bool InspectReady(string lotNumber, string serialID)
+        {
+            _lotNumber = lotNumber;
+            _serialID = serialID;
+
+            LiveMode = false;
+            UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
+            Global.Inst.InspStage.CheckImageBuffer();
+
+            ResetDisplay();
+
+            return true;
+        }
+        public bool StartAutoRun()
+        {
+            SLogger.Write("Action : StartAutoRun");
+
+            string modelPath = CurModel.ModelPath;
+            if (modelPath == "")
+            {
+                SLogger.Write("열려진 모델이 없습니다!", SLogger.LogType.Error);
+                MessageBox.Show("열려진 모델이 없습니다!");
+                return false;
+            }
+
+            LiveMode = false;
+            UseCamera = SettingXml.Inst.CamType != CameraType.None ? true : false;
+
+            SetWorkingState(WorkingState.INSPECT);
+
+            return true;
+        }
+        public void SetWorkingState(WorkingState workingState)
+        {
+            var cameraForm = MainForm.GetDockForm<CameraForm>();
+            if (cameraForm != null)
+            {
+                cameraForm.SetWorkingState(workingState);
+            }
+        }
+
+
+
         #region Disposable
 
         private bool disposed = false; // to detect redundant calls
